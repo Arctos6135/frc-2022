@@ -24,13 +24,17 @@ public final class Constants {
     // Shooter Motors 
     // TODO: Write constants for shooter motors 
 
-    // SPARK MAX Encoder 
-    // TODO: change wheel diameter 
+    // SPARK MAX Encoders 
     // TODO: change gearbox ratio 
-    public static final double WHEEL_DIAMETER = 4.0;
-    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+    public static final double WHEEL_DIAMETER = 4.0; // inches 
+    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI; // inches 
     public static final double GEARBOX_RATIO = 0;
-    public static final double POSITION_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO;
-    public static final double VELOCITY_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO / 60;
-    public static final int COUNTS_PER_REVOLUTION = 42; 
+    public static final double POSITION_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO; // inches 
+    public static final double VELOCITY_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO / 60; // inches / second
+    public static final int COUNTS_PER_REVOLUTION = 42;
+    
+    // Warning and Shutoff Temperatures 
+    public static final double MOTOR_WARNING_TEMP = 70;
+    public static final double MOTOR_SHUTOFF_TEMP = 90; 
+    
 }

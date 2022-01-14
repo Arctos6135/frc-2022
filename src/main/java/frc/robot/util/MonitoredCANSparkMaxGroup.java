@@ -4,6 +4,8 @@ import java.util.function.BiConsumer;
 
 import com.revrobotics.CANSparkMax;
 
+import frc.robot.RobotContainer;
+
 public class MonitoredCANSparkMaxGroup {
     
     private final double SHUTOFF_TEMPERATURE;
@@ -94,7 +96,44 @@ public class MonitoredCANSparkMaxGroup {
         boolean shutoff = false;
         boolean warning = false;
         
+        // Check each motor. 
+        for (var i = 0; i < motors.length; i++) {
+            CANSparkMax motor = motors[i];
+
+            // Check each motor for faults.
+            short faults = motor.getFaults();
+
+            if (faults != motorFaults[i] && faults != 0) {
+                RobotContainer.getLogger().logError(name + " motor " + motor.getDeviceId() + " had faults " + faults);
+            }
+
+            motorFaults[i] = faults;
+
+            // Check all motors for temperature.
+            double temp = motor.getMotorTemperature();
+
+            if (temp >= SHUTOFF_TEMPERATURE) {
+                // Call the callback if the motor was not overheating prior to the check.
+                if (!overheatShutoff && overheatShutoffCallback != null) {
+                    overheatShutoffCallback.accept(motor, temp);
+                }
+                shutoff = true;
+            } else if (temp >= WARNING_TEMPERATURE) {
+                // Call the callback if the motor was not overheating prior to the check.
+                if (!overheatWarning && overheatWarningCallback != null) {
+                    overheatWarningCallback.accept(motor, temp);
+                }
+                warning = true;
+            }
+        }
         
+        // Run the normal callback upon return to normal temperatures.
+        if ((overheatShutoff || overheatWarning) && (!shutoff && !warning) && normalTempCallback != null) {
+            normalTempCallback.run();
+        }
+        
+        overheatShutoff = shutoff;
+        overheatWarning = warning; 
     }
 
 }
