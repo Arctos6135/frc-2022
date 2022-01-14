@@ -27,7 +27,7 @@ public final class Constants {
     // SPARK MAX Encoder 
     // TODO: change wheel diameter 
     // TODO: change gearbox ratio 
-    public static final double WHEEL_DIAMETER = 0.0;
+    public static final double WHEEL_DIAMETER = 4.0;
     public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
     public static final double GEARBOX_RATIO = 0;
     public static final double POSITION_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO;
