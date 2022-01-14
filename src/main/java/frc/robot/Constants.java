@@ -12,4 +12,25 @@ package frc.robot;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {}
+public final class Constants {
+
+    // SPARK MAX Motors 
+    // TODO: Placeholder values as of now 
+    public static final int RIGHT_CANSPARKMAX = 1;
+    public static final int LEFT_CANSPARKMAX = 2;
+    public static final int RIGHT_CANSPARKMAX_FOLLOWER = 3;
+    public static final int LEFT_CANSPARKMAX_FOLLOWER = 4;
+
+    // Shooter Motors 
+    // TODO: Write constants for shooter motors 
+
+    // SPARK MAX Encoder 
+    // TODO: change wheel diameter 
+    // TODO: change gearbox ratio 
+    public static final double WHEEL_DIAMETER = 0.0;
+    public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+    public static final double GEARBOX_RATIO = 0;
+    public static final double POSITION_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO;
+    public static final double VELOCITY_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO / 60;
+    public static final int COUNTS_PER_REVOLUTION = 42; 
+}
