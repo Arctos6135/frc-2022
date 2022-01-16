@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.EncoderType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,6 +39,9 @@ public class Drivetrain extends SubsystemBase {
   // Acceleration of Motors
   private double leftMotorLastRate, rightMotorLastRate = 0;
   private double lastTime = 0; // TODO: does this have to be initialized?  
+
+  // Robot Navigation System 
+  private final AHRS ahrs; 
 
   // Break Mode: motors are brought to a quick stop (motor wires are shorted together). 
   // Coast Mode: motors can spin at their own rates (motor wires disconnected).
@@ -198,11 +203,53 @@ public class Drivetrain extends SubsystemBase {
     return new double[] { leftAccel, rightAccel };
   }
   
+  /**
+   * Get the Idle Mode of the Drivetrain.
+   * 
+   * @return the idle mode. 
+   */
   public IdleMode getIdleMode() {
-    return this.idleMode; 
+    return this.idleMode;
   }
   
-  // TODO: robot heading 
+  /**
+   * Set the Idle Mode (brake/coast) of the drivetrain motors. 
+   * @param mode
+   */
+  public void setMotorMode(IdleMode mode) {
+    idleMode = mode;
+    leftMotor.setIdleMode(mode);
+    rightMotor.setIdleMode(mode); 
+  }
+  
+  // Robot Navigation 
+
+  /**
+   * Return the heading of the robot.
+   * 
+   * @return the heading of the robot in degrees.
+   */
+  public double getHeading() {
+    return ahrs.getFusedHeading();
+  }
+  
+  /**
+   * Reset the heading of the robot.
+   */
+  public void zeroHeading() {
+    ahrs.reset(); 
+  }
+
+  /**
+   * Get the robot's Atttude and Heading Reference System.
+   * 
+   * @return the robot's AHRS.
+   */
+  public AHRS getAHRS() {
+    return this.ahrs;
+  }
+
+  
 
   /**
    * Drives the robot with forwards/backwards translation and rotation.
@@ -263,6 +310,9 @@ public class Drivetrain extends SubsystemBase {
    *                      controller.
    */
   public Drivetrain(int rightMaster, int leftMaster, int rightFollower, int leftFollower) {
+    // Robot Navigation 
+    ahrs = new AHRS(I2C.Port.kOnboard); 
+
     // Motor Instantiation
     rightMotor = new CANSparkMax(rightMaster, MotorType.kBrushless);
     leftMotor = new CANSparkMax(leftMaster, MotorType.kBrushless);

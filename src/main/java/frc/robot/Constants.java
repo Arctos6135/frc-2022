@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -35,6 +37,22 @@ public final class Constants {
     
     // Warning and Shutoff Temperatures 
     public static final double MOTOR_WARNING_TEMP = 70;
-    public static final double MOTOR_SHUTOFF_TEMP = 90; 
+    public static final double MOTOR_SHUTOFF_TEMP = 90;
     
+    // Xbox Controller 
+    public static final double CONTROLLER_DEADZONE = 0.15;
+
+    // Driver Controller 
+    public static final int XBOX_DRIVER = 0;
+    public static final int DRIVE_FWD_REV = XboxController.Axis.kLeftY.value;
+    public static final int DRIVE_LEFT_RIGHT = XboxController.Axis.kRightX.value;
+    public static final int REVERSE_DRIVE_DIRECTION = XboxController.Button.kStickLeft.value;
+    public static final int OVERRIDE_MOTOR_PROTECTION = XboxController.Button.kB.value;
+    public static final int PRECISION_DRIVE_TOGGLE = XboxController.Button.kX.value;
+    public static final int PRECISION_DRIVE_HOLD = XboxController.Axis.kLeftTrigger.value; 
+    
+
+    
+    // Operator Controller 
+    public static final int XBOX_OPERATOR = 1;
 }
