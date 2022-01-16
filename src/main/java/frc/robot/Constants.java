@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.arctos6135.robotpathfinder.core.RobotSpecs;
+
 import edu.wpi.first.wpilibj.XboxController;
 
 /**
@@ -51,8 +53,14 @@ public final class Constants {
     public static final int PRECISION_DRIVE_TOGGLE = XboxController.Button.kX.value;
     public static final int PRECISION_DRIVE_HOLD = XboxController.Axis.kLeftTrigger.value; 
     
-
-    
     // Operator Controller 
     public static final int XBOX_OPERATOR = 1;
+
+    // Robot Dimensions 
+    // TODO: change these to match robot 
+    public static final double ROBOT_MAX_VELOCITY = 0;
+    public static final double ROBOT_MAX_ACCELERATION = 0;
+    public static final double ROBOT_BASE_WIDTH = 0; // inches 
+    public static final RobotSpecs ROBOT_SPECS = new RobotSpecs(ROBOT_MAX_VELOCITY, ROBOT_MAX_ACCELERATION,
+            ROBOT_BASE_WIDTH); 
 }
