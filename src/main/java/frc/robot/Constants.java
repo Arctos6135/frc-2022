@@ -63,4 +63,7 @@ public final class Constants {
     public static final double ROBOT_BASE_WIDTH = 0; // inches 
     public static final RobotSpecs ROBOT_SPECS = new RobotSpecs(ROBOT_MAX_VELOCITY, ROBOT_MAX_ACCELERATION,
             ROBOT_BASE_WIDTH); 
+
+    // Drive 
+    public static final double COLLISION_THRESHOLD = 0.5f; // TODO: tune the collision threshold 
 }
