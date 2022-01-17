@@ -4,11 +4,22 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import com.arctos6135.robotlib.logging.RobotLogger;
 import com.arctos6135.robotlib.newcommands.triggers.AnalogTrigger;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +39,22 @@ public class RobotContainer {
   private final Drivetrain drivetrain;
 
   private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER); 
-  private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR); 
+  private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
+  
+  // Shuffleboard Tabs
+  private final ShuffleboardTab configTab;
+  private final ShuffleboardTab driveTab;
+  private final ShuffleboardTab prematchTab;
+  private final ShuffleboardTab debugTab;
+
+  // Network Tables for Smart Dashboard 
+  private NetworkTableEntry driveReversedEntry;
+  private NetworkTableEntry precisionDriveEntry;
+  private NetworkTableEntry overrideModeEntry; 
+  
+  // Logging Related 
+  private NetworkTableEntry lastError;
+  private NetworkTableEntry lastWarning; 
 
   private static final RobotLogger logger = new RobotLogger();
 
@@ -37,12 +63,73 @@ public class RobotContainer {
 
     drivetrain = new Drivetrain(Constants.RIGHT_CANSPARKMAX, Constants.LEFT_CANSPARKMAX,
         Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
-        
+    drivetrain.setDefaultCommand(
+        new TeleopDrive(drivetrain, driverController, Constants.DRIVE_FWD_REV, Constants.DRIVE_LEFT_RIGHT));
+    
+    // Shuffle Board Tabs 
+    configTab = Shuffleboard.getTab("Config");
+    driveTab = Shuffleboard.getTab("Drive");
+    prematchTab = Shuffleboard.getTab("Pre-match");
+    debugTab = Shuffleboard.getTab("Debug");
 
+    configureDashboard();
 
+    while (!DriverStation.getInstance().isDSAttached()) {
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        // NetworkTableEntry for last error or log the error 
+      }
+    }
 
+    initLogger();
+    
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  private void configureDashboard() {
+    // Configure Tabs 
+    configTab.add("Precision Drive Factor", TeleopDrive.getPrecisionFactor()).withPosition(0, 0).withSize(9, 4)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.0, "max", 1.0)).getEntry()
+    .addListener(notif -> {
+      TeleopDrive.setPrecisionFactor(notif.value.getDouble()); 
+        }, EntryListenerFlags.kUpdate);
+    
+    configTab.add("Motor Ramping Rate", TeleopDrive.getRampingRate()).withPosition(9, 0).withSize(9, 4)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.0, "max", 1.0)).getEntry()
+    .addListener(notif -> {
+      TeleopDrive.setRampingRate(notif.value.getDouble()); 
+        }, EntryListenerFlags.kUpdate);
+        
+    configTab.add("Motor Warning Temp", Constants.MOTOR_WARNING_TEMP).withWidget(BuiltInWidgets.kNumberSlider)
+    .withPosition(18, 0).withSize(9, 4).withProperties(Map.of("min", 0.0, "max", 150.0)).getEntry()
+    .addListener(notif -> {
+      Constants.MOTOR_WARNING_TEMP = notif.value.getDouble(); 
+        }, EntryListenerFlags.kUpdate);
+        
+    configTab.add("Motor Shutoff Temp", Constants.MOTOR_SHUTOFF_TEMP).withWidget(BuiltInWidgets.kNumberSlider)
+    .withPosition(27, 0).withSize(9, 4).withProperties(Map.of("min", 0.0, "max", 150.0)).getEntry()
+    .addListener(notif -> {
+      Constants.MOTOR_SHUTOFF_TEMP = notif.value.getDouble(); 
+        }, EntryListenerFlags.kUpdate);
+        
+    // Drive Tabs 
+    driveTab.add("Gyro", drivetrain.getAHRS()).withWidget(BuiltInWidgets.kGyro).withPosition(0, 4).withSize(9, 10); 
+
+    // Driving Related Entries
+    driveReversedEntry = driveTab.add("Reversed", TeleopDrive.isReversed()).withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(0, 0).withSize(4, 4).getEntry();
+    
+    precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(4, 0).withSize(4, 4).getEntry();
+    
+    
+  }
+
+  private void configureNetworkEntries() {
+
   }
 
   /**
@@ -97,6 +184,16 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // TODO: implement an autonomous command 
     return new InstantCommand();
+  }
+
+  private void initLogger() {
+    try {
+      logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
+      // TODO: initialize logger settings 
+    } catch (IOException e) {
+      e.printStackTrace();
+      // TODO: log the error 
+    }
   }
   
   /**

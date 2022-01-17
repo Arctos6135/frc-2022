@@ -38,8 +38,8 @@ public final class Constants {
     public static final int COUNTS_PER_REVOLUTION = 42;
     
     // Warning and Shutoff Temperatures 
-    public static final double MOTOR_WARNING_TEMP = 70;
-    public static final double MOTOR_SHUTOFF_TEMP = 90;
+    public static double MOTOR_WARNING_TEMP = 70;
+    public static double MOTOR_SHUTOFF_TEMP = 90;
     
     // Xbox Controller 
     public static final double CONTROLLER_DEADZONE = 0.15;
