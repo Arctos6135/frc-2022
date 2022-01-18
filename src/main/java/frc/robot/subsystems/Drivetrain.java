@@ -249,8 +249,6 @@ public class Drivetrain extends SubsystemBase {
     return this.ahrs;
   }
 
-  
-
   /**
    * Drives the robot with forwards/backwards translation and rotation.
    * 
