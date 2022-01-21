@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import javax.management.monitor.Monitor;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -291,7 +293,16 @@ public class Drivetrain extends SubsystemBase {
     rightMotor.burnFlash();
     leftMotor.burnFlash();
     rightFollowerMotor.burnFlash();
-    leftFollowerMotor.burnFlash(); 
+    leftFollowerMotor.burnFlash();
+  }
+  
+  /**
+   * Get the motor monitor group for the drivetrain.
+   * 
+   * @return the monitor group for the drivetrain motors. 
+   */
+  public MonitoredCANSparkMaxGroup getMonitorGroup() {
+    return this.motorMonitorGroup; 
   }
 
 

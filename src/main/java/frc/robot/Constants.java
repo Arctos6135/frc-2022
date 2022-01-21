@@ -66,4 +66,9 @@ public final class Constants {
 
     // Drive 
     public static final double COLLISION_THRESHOLD = 0.5f; // TODO: tune the collision threshold 
+
+    public static final int COLOR_MOTOR_OK = 0x00FF00FF;
+    public static final int COLOR_MOTOR_WARNING = 0xFFFF00FF;
+    public static final int COLOR_MOTOR_SHUTOFF = 0xFF0000FF;
+    public static final int COLOR_MOTOR_OVERRIDDEN = 0xA72DFFFF;
 }
