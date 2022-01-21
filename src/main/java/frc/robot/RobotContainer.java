@@ -130,8 +130,6 @@ public class RobotContainer {
     precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(4, 0).withSize(4, 4).getEntry();
     
-    
-    
     // Overheating Warnings 
     drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
       if (!drivetrain.getOverheatShutoffOverride()) {
