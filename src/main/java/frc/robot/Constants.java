@@ -28,6 +28,12 @@ public final class Constants {
     // Shooter Motors 
     // TODO: Write constants for shooter motors 
 
+    // Intake Motors 
+    // TODO: Placeholder values as of now 
+    // TODO: check final robot intake subsystem design 
+    public static final int LEFT_INTAKE_MOTOR = 0;
+    public static final int RIGHT_INTAKE_MOTOR = 0; 
+
     // SPARK MAX Encoders 
     // TODO: change gearbox ratio 
     public static final double WHEEL_DIAMETER = 4.0; // inches 
@@ -52,7 +58,9 @@ public final class Constants {
     public static final int OVERRIDE_MOTOR_PROTECTION = XboxController.Button.kB.value;
     public static final int PRECISION_DRIVE_TOGGLE = XboxController.Button.kX.value;
     public static final int PRECISION_DRIVE_HOLD = XboxController.Axis.kLeftTrigger.value; 
-    
+    public static final int INTAKE_FORWARD_BUTTON = XboxController.Button.kBumperLeft.value; 
+    public static final int INTAKE_REVERSE_BUTTON = XboxController.Button.kBumperRight.value; 
+
     // Operator Controller 
     public static final int XBOX_OPERATOR = 1;
 
