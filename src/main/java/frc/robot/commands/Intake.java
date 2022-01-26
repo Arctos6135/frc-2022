@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 
+// TODO: intake system has a moving arm, will need to add to the subsystem 
 public class Intake extends CommandBase {
     private final IntakeSubsystem intakeSubsystem;
     private final XboxController controller; // TODO: may need to change to GenericHID

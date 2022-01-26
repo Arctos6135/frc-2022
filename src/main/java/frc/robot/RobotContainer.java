@@ -24,9 +24,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 import frc.robot.commands.Intake;
+import frc.robot.commands.Shoot;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -43,6 +45,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drivetrain;
   private final IntakeSubsystem intakeSubsystem; 
+  private final Shooter shooterSubsystem; 
 
   private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER); 
   private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
@@ -78,6 +81,11 @@ public class RobotContainer {
     intakeSubsystem = new IntakeSubsystem(Constants.LEFT_INTAKE_MOTOR, Constants.RIGHT_INTAKE_MOTOR);
     intakeSubsystem.setDefaultCommand(
       new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
+    );
+
+    shooterSubsystem = new Shooter(Constants.SHOOTER_MASTER, Constants.SHOOTER_FOLLOWER); 
+    shooterSubsystem.setDefaultCommand(
+      new Shoot(shooterSubsystem) // TODO: update when shoot command is updated 
     );
     
     // Shuffle Board Tabs 

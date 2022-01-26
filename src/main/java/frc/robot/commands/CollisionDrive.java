@@ -23,6 +23,7 @@ public class CollisionDrive extends CommandBase {
     double lastAccelY = 0;
     
     /**
+     * Create a new Collision Drive command instance. 
      * 
      * @param ahrs the robot navigation system.
      * @param drivetrain the robot drivetrain.
