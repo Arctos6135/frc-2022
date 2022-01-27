@@ -113,7 +113,7 @@ public class Shooter extends SubsystemBase {
      * 
      * @return the monitor group for the shooter. 
      */
-    public MonitoredCANSparkMaxGroup getMonitoredCANSparkMaxGroup() {
+    public MonitoredCANSparkMaxGroup getMonitorGroup() {
         return this.monitorGroup; 
     }
 

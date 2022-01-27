@@ -25,7 +25,7 @@ public class Shoot extends CommandBase {
         velocityReached = false; 
 
         // TODO: check for aiming via Limelight 
-        if (!shooter.getOverheatShutoffOverride() && shooter.getMonitoredCANSparkMaxGroup().getOverheatShutoff()) {
+        if (!shooter.getOverheatShutoffOverride() && shooter.getMonitorGroup().getOverheatShutoff()) {
             finished = true; 
             RobotContainer.getLogger().logError("Shooter is overheating, cannot shoot."); 
         }

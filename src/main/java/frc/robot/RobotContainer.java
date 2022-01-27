@@ -67,6 +67,7 @@ public class RobotContainer {
   
   // Drivetrain Status 
   private SimpleWidget drivetrainMotorStatus; 
+  private SimpleWidget shooterMotorStatus; 
 
   private static final RobotLogger logger = new RobotLogger();
 
@@ -85,9 +86,9 @@ public class RobotContainer {
 
     shooterSubsystem = new Shooter(Constants.SHOOTER_MASTER, Constants.SHOOTER_FOLLOWER); 
     shooterSubsystem.setDefaultCommand(
-      new Shoot(shooterSubsystem) // TODO: update when shoot command is updated 
+      new Shoot(shooterSubsystem) 
     );
-    
+
     // Shuffle Board Tabs 
     configTab = Shuffleboard.getTab("Config");
     driveTab = Shuffleboard.getTab("Drive");
@@ -162,13 +163,30 @@ public class RobotContainer {
         drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING))
             .getEntry().setBoolean(false);
       }
-      
       getLogger()
           .logWarning("Drivetrain motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!");
     });
 
     drivetrain.getMonitorGroup().setNormalTempCallback(() -> {
       drivetrainMotorStatus.getEntry().setBoolean(true); 
+    });
+
+    shooterSubsystem.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
+      if (!shooterSubsystem.getOverheatShutoffOverride()) {
+        shooterMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_SHUTOFF))
+            .getEntry().setBoolean(false); 
+      }
+      getLogger()
+          .logError("Shooter motor " + motor.getDeviceId() + " reched overheat shutoff limit at " + temp + "C!"); 
+    });
+
+    shooterSubsystem.getMonitorGroup().setOverheatWarningCallback((motor, temp) -> {
+      if (!shooterSubsystem.getOverheatShutoffOverride()) {
+        shooterMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING))
+            .getEntry().setBoolean(false); 
+      }
+      getLogger()
+          .logWarning("Shooter motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!"); 
     });
 
   }
@@ -217,6 +235,11 @@ public class RobotContainer {
     });
   }
 
+
+
+
+
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
