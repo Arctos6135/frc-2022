@@ -291,7 +291,16 @@ public class Drivetrain extends SubsystemBase {
     rightMotor.burnFlash();
     leftMotor.burnFlash();
     rightFollowerMotor.burnFlash();
-    leftFollowerMotor.burnFlash(); 
+    leftFollowerMotor.burnFlash();
+  }
+  
+  /**
+   * Get the motor monitor group for the drivetrain.
+   * 
+   * @return the monitor group for the drivetrain motors. 
+   */
+  public MonitoredCANSparkMaxGroup getMonitorGroup() {
+    return this.motorMonitorGroup; 
   }
 
 

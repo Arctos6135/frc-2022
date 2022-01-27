@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.arctos6135.robotlib.logging.RobotLogger;
 import com.arctos6135.robotlib.newcommands.triggers.AnalogTrigger;
@@ -20,8 +21,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+
+import frc.robot.commands.Intake;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -37,10 +42,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain drivetrain;
+  private final IntakeSubsystem intakeSubsystem; 
 
   private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER); 
   private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
-  
+
   // Shuffleboard Tabs
   private final ShuffleboardTab configTab;
   private final ShuffleboardTab driveTab;
@@ -54,7 +60,10 @@ public class RobotContainer {
   
   // Logging Related 
   private NetworkTableEntry lastError;
-  private NetworkTableEntry lastWarning; 
+  private NetworkTableEntry lastWarning;
+  
+  // Drivetrain Status 
+  private SimpleWidget drivetrainMotorStatus; 
 
   private static final RobotLogger logger = new RobotLogger();
 
@@ -65,6 +74,11 @@ public class RobotContainer {
         Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
     drivetrain.setDefaultCommand(
         new TeleopDrive(drivetrain, driverController, Constants.DRIVE_FWD_REV, Constants.DRIVE_LEFT_RIGHT));
+
+    intakeSubsystem = new IntakeSubsystem(Constants.LEFT_INTAKE_MOTOR, Constants.RIGHT_INTAKE_MOTOR);
+    intakeSubsystem.setDefaultCommand(
+      new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
+    );
     
     // Shuffle Board Tabs 
     configTab = Shuffleboard.getTab("Config");
@@ -125,10 +139,29 @@ public class RobotContainer {
     precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(4, 0).withSize(4, 4).getEntry();
     
-    
-  }
+    // Overheating Warnings 
+    drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
+      if (!drivetrain.getOverheatShutoffOverride()) {
+        drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_SHUTOFF)).getEntry()
+            .setBoolean(false);
+      }
+      getLogger()
+          .logError("Drivetrain motor " + motor.getDeviceId() + " reached overheat shutoff limit at " + temp + "C!"); 
+    });
 
-  private void configureNetworkEntries() {
+    drivetrain.getMonitorGroup().setOverheatWarningCallback((motor, temp) -> {
+      if (!drivetrain.getOverheatShutoffOverride()) {
+        drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING))
+            .getEntry().setBoolean(false);
+      }
+      
+      getLogger()
+          .logWarning("Drivetrain motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!");
+    });
+
+    drivetrain.getMonitorGroup().setNormalTempCallback(() -> {
+      drivetrainMotorStatus.getEntry().setBoolean(true); 
+    });
 
   }
 
@@ -190,9 +223,23 @@ public class RobotContainer {
     try {
       logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
       // TODO: initialize logger settings 
+
+      logger.setLevel(Level.FINE);
+      
+      logger.setLogHandler((level, message) -> {
+        if (level == Level.SEVERE) {
+          lastError.setString(message); 
+        } else if (level == Level.WARNING) {
+          lastWarning.setString(message); 
+        }
+      });
+
+      logger.cleanLogs(72);
+      logger.logInfo("Logger initialized");
+      
     } catch (IOException e) {
       e.printStackTrace();
-      // TODO: log the error 
+      lastError.setString("Failed to initialize logger"); 
     }
   }
   
