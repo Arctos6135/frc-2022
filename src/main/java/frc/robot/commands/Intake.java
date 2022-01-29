@@ -5,13 +5,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
 
-// TODO: intake system has a moving arm, will need to add to the subsystem 
+// TODO: intake system has a moving arm, will need to add to the subsystem
 public class Intake extends CommandBase {
     private final IntakeSubsystem intakeSubsystem;
     private final XboxController controller; // TODO: may need to change to GenericHID
     private final int forwardButton;
     private final int reverseButton;
-    
+   
     public Intake(IntakeSubsystem intakeSubsystem, XboxController controller, int forwardButton, int reverseButton) {
         this.intakeSubsystem = intakeSubsystem;
         this.controller = controller;
@@ -20,7 +20,7 @@ public class Intake extends CommandBase {
         addRequirements(intakeSubsystem);
     }
 
-    @Override 
+    @Override
     public void execute() {
         boolean forward = controller.getRawButton(forwardButton);
         boolean reverse = controller.getRawButton(reverseButton);
@@ -38,15 +38,15 @@ public class Intake extends CommandBase {
     public void initialize() {
 
     }
-    
-    @Override 
+   
+    @Override
     public void end(boolean interrupted) {
         intakeSubsystem.setIntakeMotors(0);
     }
-    
-    @Override 
+   
+    @Override
     public boolean isFinished() {
-        return false; 
+        return false;
     }
-    
+   
 }
