@@ -34,33 +34,33 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 // ontains all commands and subsystems
 public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
-	private final Drivetrain drivetrain;
-	private final IntakeSubsystem intakeSubsystem; 
-	private final Shooter shooterSubsystem; 
+	final Drivetrain drivetrain;
+	final IntakeSubsystem intakeSubsystem; 
+	final Shooter shooterSubsystem; 
 
-	private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER); 
-	private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
+	static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER); 
+	static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
 
 	// Shuffleboard Tabs
-	private final ShuffleboardTab configTab;
-	private final ShuffleboardTab driveTab;
-	private final ShuffleboardTab prematchTab;
-	private final ShuffleboardTab debugTab;
+	final ShuffleboardTab configTab;
+	final ShuffleboardTab driveTab;
+	final ShuffleboardTab prematchTab;
+	final ShuffleboardTab debugTab;
 
 	// Network Tables for Smart Dashboard 
-	private NetworkTableEntry driveReversedEntry;
-	private NetworkTableEntry precisionDriveEntry;
-	private NetworkTableEntry overrideModeEntry; 
+	NetworkTableEntry driveReversedEntry;
+	NetworkTableEntry precisionDriveEntry;
+	NetworkTableEntry overrideModeEntry; 
 	
 	// Logging Related 
-	private NetworkTableEntry lastError;
-	private NetworkTableEntry lastWarning;
+	NetworkTableEntry lastError;
+	NetworkTableEntry lastWarning;
 	
 	// Drivetrain Status 
-	private SimpleWidget drivetrainMotorStatus; 
-	private SimpleWidget shooterMotorStatus; 
+	SimpleWidget drivetrainMotorStatus; 
+	SimpleWidget shooterMotorStatus; 
 
-	private static final RobotLogger logger = new RobotLogger();
+	static final RobotLogger logger = new RobotLogger();
 
 	// stores shooter status
 	public boolean shooterReady = false;
@@ -106,7 +106,7 @@ public class RobotContainer {
 		configureButtonBindings();
 	}
 
-	private void configureDashboard() {
+	void configureDashboard() {
 		// Configure Tabs 
 		configTab.add("Precision Drive Factor", TeleopDrive.getPrecisionFactor()).withPosition(0, 0).withSize(9, 4)
 		.withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.0, "max", 1.0)).getEntry()
@@ -136,17 +136,14 @@ public class RobotContainer {
 		driveTab.add("Gyro", drivetrain.getAHRS()).withWidget(BuiltInWidgets.kGyro).withPosition(0, 4).withSize(9, 10); 
 
 		// Driving Related Entries
-		driveReversedEntry = driveTab.add("Reversed", TeleopDrive.isReversed()).withWidget(BuiltInWidgets.kBooleanBox)
-				.withPosition(0, 0).withSize(4, 4).getEntry();
+		driveReversedEntry = driveTab.add("Reversed", TeleopDrive.isReversed()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(0, 0).withSize(4, 4).getEntry();
 		
-		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
-				.withPosition(4, 0).withSize(4, 4).getEntry();
+		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(4, 0).withSize(4, 4).getEntry();
 		
 		// Overheating Warnings 
 		drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
 			if (!drivetrain.getOverheatShutoffOverride()) {
-				drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_SHUTOFF)).getEntry()
-						.setBoolean(false);
+				drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_SHUTOFF)).getEntry().setBoolean(false);
 			}
 			getLogger()
 					.logError("Drivetrain motor " + motor.getDeviceId() + " reached overheat shutoff limit at " + temp + "C!"); 
@@ -154,16 +151,12 @@ public class RobotContainer {
 
 		drivetrain.getMonitorGroup().setOverheatWarningCallback((motor, temp) -> {
 			if (!drivetrain.getOverheatShutoffOverride()) {
-				drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING))
-						.getEntry().setBoolean(false);
+				drivetrainMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING)).getEntry().setBoolean(false);
 			}
-			getLogger()
-					.logWarning("Drivetrain motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!");
+			getLogger().logWarning("Drivetrain motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!");
 		});
 
-		drivetrain.getMonitorGroup().setNormalTempCallback(() -> {
-			drivetrainMotorStatus.getEntry().setBoolean(true); 
-		});
+		drivetrain.getMonitorGroup().setNormalTempCallback(() -> drivetrainMotorStatus.getEntry().setBoolean(true));
 
 		shooterSubsystem.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
 			if (!shooterSubsystem.getOverheatShutoffOverride())
@@ -177,14 +170,29 @@ public class RobotContainer {
 			getLogger().logWarning("Shooter motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!"); 
 		});
 
+		shooterSpeed.whilePressed = (void()){
+			// modify to multiply by some constant, post-assembly.
+			this.shooterSpeed = deployShooter.get();
+		}
+
+		prepareShooter.whenPressed = (void()){
+			// prepare shooter
+			this.shooterReady = true;
+		}
+
+		deployShooter.whenPressed = (void()){
+			// fire shooter
+			this.shooterReady = false;
+		}
+
 	}
 
-	private double shooterDistToSpeed(double dist, double endh) {
-		// angle is 1.222, sec(1.222) = 1.926
-		return 9.807*dist*dist/(dist*1.926-endh);
+	double shooterDistToPower(double x, double y) {
+		// angle is 1.222, sec(1.222) = 1.926, csc2(1.222) = 1.132
+		return 1.132*9.807*x*x/(1.926*x-y)*Constants.BALL_MASS;
 	}
 
-	private void configureButtonBindings() {
+	void configureButtonBindings() {
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
@@ -223,7 +231,7 @@ public class RobotContainer {
 		return new InstantCommand();
 	}
 
-	private void initLogger() {
+	void initLogger() {
 		try {
 			logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
 
