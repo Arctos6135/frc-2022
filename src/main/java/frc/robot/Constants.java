@@ -79,4 +79,8 @@ public final class Constants {
     public static final int COLOR_MOTOR_WARNING = 0xFFFF00FF;
     public static final int COLOR_MOTOR_SHUTOFF = 0xFF0000FF;
     public static final int COLOR_MOTOR_OVERRIDDEN = 0xA72DFFFF;
+
+    // Shooter Motor PDP Pins
+    public static final int SHOOTER_MASTER = 0; 
+    public static final int SHOOTER_FOLLOWER = 0;
 }
