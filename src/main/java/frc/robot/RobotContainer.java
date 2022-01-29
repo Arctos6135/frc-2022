@@ -34,12 +34,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 // Contains all commands and subsystems
 public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
-	final Drivetrain drivetrain;
-	final IntakeSubsystem intakeSubsystem;
-	final Shooter shooterSubsystem;
+	private final Drivetrain drivetrain;
+	private final IntakeSubsystem intakeSubsystem;
+	private final Shooter shooterSubsystem;
 
-	static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER);
-	static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
+	private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER);
+	private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
 
 	// Shuffleboard Tabs
 	final ShuffleboardTab configTab;
@@ -64,6 +64,7 @@ public class RobotContainer {
 
 	// contains subsystems, OI devices, and commands
 	public RobotContainer() {
+
 		drivetrain = new Drivetrain(Constants.RIGHT_CANSPARKMAX, Constants.LEFT_CANSPARKMAX,
 			Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
 		drivetrain.setDefaultCommand(
@@ -74,8 +75,7 @@ public class RobotContainer {
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
-		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR); 
-
+		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
 		shooterSubsystem.setDefaultCommand(
 			new Shoot(shooterSubsystem)
 		);
@@ -163,33 +163,18 @@ public class RobotContainer {
 				shooterMotorStatus.withProperties(Map.of("color when false", Constants.COLOR_MOTOR_WARNING)).getEntry().setBoolean(false);
 			getLogger().logWarning("Shooter motor " + motor.getDeviceId() + " reached overheat warning at " + temp + " C!");
 		});
-
-		shooterSpeed.whilePressed = (void()){
-			// modify to multiply by some constant, post-assembly.
-			shooterSubsystem.shooterSpeed = shooterSubsystem.getVelocity();
-		}
-
-		prepareShooter.whenPressed = (void()){
-			// prepare shooter
-			shooterSubsystem.shooterReady = true;
-		}
-
-		deployShooter.whenPressed = (void()){
-			if (shooterSubsystem.shooterReady) shooterSubsystem.fire();
-			shooterSubsystem.shooterReady = false;
-		}
-
 	}
 
-	void configureButtonBindings() {
+	private void configureButtonBindings() {
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
-
 		// TODO: connect to shooter data
-		Button deployShooter = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER);
-		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER);
-
+		
+		Button shooterSpeed = new JoystickButton(operatorController, Constants.SHOOTER_SPEED_BUTTON);
+		Button deployShooter = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_BUTTON);
+		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
+		
 		AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
 
 		// Driver Button Bindings
@@ -217,15 +202,29 @@ public class RobotContainer {
 			}
 		});
 
-		// TODO: Shooter Button Bindings 
-		
+		shooterSpeed.whileHeld(() -> {
+			// modify to multiply by some constant, post-assembly.
+			// shooterSubsystem.shooterSpeed = shooterSubsystem.getVelocity();
+
+		}); 
+
+		prepareShooter.whenPressed(() -> {
+			// prepare shooter
+			shooterSubsystem.shooterReady = true;
+		});
+
+		deployShooter.whileActiveOnce(
+			new Shoot(shooterSubsystem)
+			// TODO: check if shooter is ready in the Shoot command
+		); 
+
 	}
 
 	public Command getAutonomousCommand() {
 		return new InstantCommand();
 	}
 
-	void initLogger() {
+	private void initLogger() {
 		try {
 			logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
 
