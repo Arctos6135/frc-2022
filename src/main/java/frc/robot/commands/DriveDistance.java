@@ -13,8 +13,8 @@ import frc.robot.subsystems.Drivetrain;
 public class DriveDistance extends FollowTrajectory {
 
     /**
-     * Instantiate a DriveDistance command. 
-     * 
+     * Instantiate a DriveDistance command.
+     *
      * @param drivetrain the drivetrain.
      * @param distance the distance to drive (inches).
      */
