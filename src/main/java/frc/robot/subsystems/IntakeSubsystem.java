@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase {
     // No Pneumatics 
 
+    // TODO: implement intake arm (should be 1/2 motors with some sort of PID control)
+
     // Motors to Spin Mecanum Wheels 
     private final CANSparkMax leftIntakeMotor;
     private final CANSparkMax rightIntakeMotor;

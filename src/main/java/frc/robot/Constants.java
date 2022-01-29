@@ -14,7 +14,7 @@ public final class Constants {
 
     // Shooter Motors 
     public static final int MAIN_SHOOTER_MOTOR = 5;
-    public static final int AUXILLIARY_SHOORTER_MOTOR = 6;
+    public static final int AUXILLIARY_SHOOTER_MOTOR = 6;
 
     // Intake Motors 
     public static final int LEFT_INTAKE_MOTOR = 0;
@@ -48,6 +48,9 @@ public final class Constants {
 
     // Operator Controller 
     public static final int XBOX_OPERATOR = 1;
+    public static final int DEPLOY_SHOOTER = XboxController.Button.kX.value;
+    public static final int PREPARE_SHOOTER = XboxController.Button.kA.value; 
+    
 
     // Robot Dimensions 
     // TODO: change these to match robot 
@@ -68,4 +71,5 @@ public final class Constants {
     // Shooter Motor PDP Pins
     public static final int SHOOTER_MASTER = 0; 
     public static final int SHOOTER_FOLLOWER = 0;
+    
 }

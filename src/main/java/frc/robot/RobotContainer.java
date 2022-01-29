@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-// ontains all commands and subsystems
+// Contains all commands and subsystems
 public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
 	private final Drivetrain drivetrain;
@@ -62,13 +62,12 @@ public class RobotContainer {
 
 	private static final RobotLogger logger = new RobotLogger();
 
-	// stores shooter status
+	// stores shooter status 
 	public boolean shooterReady = false;
-	public double  shooterSpeed;
+	public double shooterSpeed;
 
 	// contains subsystems, OI devices, and commands
 	public RobotContainer() {
-
 		drivetrain = new Drivetrain(Constants.RIGHT_CANSPARKMAX, Constants.LEFT_CANSPARKMAX,
 			Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
 		drivetrain.setDefaultCommand(
@@ -79,7 +78,7 @@ public class RobotContainer {
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
-		shooterSubsystem = new Shooter(Constants.SHOOTER_MASTER, Constants.SHOOTER_FOLLOWER); 
+		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR); 
 		shooterSubsystem.setDefaultCommand(
 			new Shoot(shooterSubsystem) 
 		);
@@ -188,9 +187,11 @@ public class RobotContainer {
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
+
 		// TODO: connect to shooter data
-		Button deployShooter = new JoystickButton(driverController, Constants.MAIN_SHOOTER_MOTOR);
-		Button prepareShooter = new JoystickButton(driverController, Constants.AUXILLIARY_SHOOTER_MOTOR);
+		Button deployShooter = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER);
+		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER);
+
 		AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
 
 		// Driver Button Bindings 
@@ -217,6 +218,9 @@ public class RobotContainer {
 				getLogger().logInfo("Drivetrain motor temperature protection re-enabled."); 
 			}
 		});
+
+		// TODO: Shooter Button Bindings 
+		
 	}
 
 	public Command getAutonomousCommand() {
