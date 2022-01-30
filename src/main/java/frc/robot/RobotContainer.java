@@ -76,7 +76,7 @@ public class RobotContainer {
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
-		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.BOTTOM_ROLLER_MOTOR, Constants.TOP_ROLLER_MOTOR); 
+		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.ROLLER_MOTOR); 
 		shooterFeederSubsystem.setDefaultCommand(
 			new InstantCommand() // TODO: set to an intake/shoot command 
 		);
