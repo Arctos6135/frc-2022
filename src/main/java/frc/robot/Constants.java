@@ -20,6 +20,9 @@ public final class Constants {
 	public static final int LEFT_INTAKE_MOTOR = 0;
 	public static final int RIGHT_INTAKE_MOTOR = 0;
 
+	public static final double INTAKE_ARM_LOWERED = 1.2; 
+	public static final double INTAKE_ARM_RAISED = 0; 
+
 	// SPARK MAX Encoders (in inches)
 	public static final double WHEEL_DIAMETER = 4.;
 	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;

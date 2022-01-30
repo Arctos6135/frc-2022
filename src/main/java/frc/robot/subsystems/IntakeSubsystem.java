@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 /**
  * The intake subsystem.
@@ -12,22 +15,61 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase {
     // No Pneumatics
 
-    // TODO: implement intake arm (should be 1/2 motors with some sort of PID control)
-
     // Motors to Spin Mecanum Wheels 
-    private final CANSparkMax leftIntakeMotor;
-    private final CANSparkMax rightIntakeMotor;
+    private final CANSparkMax mecanumWheelMotor;
+    private final CANSparkMax intakeArmMotor;
+    private final CANPIDController intakeArmPIDController; 
+ 
     private IdleMode idleMode;
+
+    private boolean intakeArmLowered = false; 
+    private double intakeArmPosition = 0; 
+
+    // Intake PID Controller Constants
+    // TODO: tune PIDF constants 
+    public final static double kP = 0, kI = 0, kD = 0, kF = 0; 
+
+    /**
+     * Get whether the intake arm is raised or lowered. 
+     * 
+     * @return whether the intake arm is raised or lowered. 
+     */
+    public boolean getIntakeArmLowered() {
+        return this.intakeArmLowered; 
+    }
+
+    /**
+     * Get the intake arm position. 
+     * 
+     * @return the intake arm position. 
+     */
+    public double getIntakeArmPosition() {
+        return this.intakeArmPosition; 
+    }
 
     /**
      * Set the speed of the intake motors.
      *
      * @param scale the speed of the motors.
      */
-    public void setIntakeMotors(double scale) {
-        // TODO: may need to monitor these motors
-        leftIntakeMotor.set(scale);
-        rightIntakeMotor.set(scale);
+    public void setMecanumWheelMotor(double scale) {
+        mecanumWheelMotor.set(scale); 
+    }
+
+    /**
+     * Rotate the intake arm to a position.
+     * 
+     * @param setpoint the position of the intake arm, restricted to [-1.0, 1.0]. 
+     */
+    public void setIntakeArmPosition(double setpoint) {
+        this.intakeArmPIDController.setReference(setpoint, ControlType.kPosition); 
+        this.intakeArmPosition = setpoint; 
+
+        if (setpoint == Constants.INTAKE_ARM_LOWERED) {
+            this.intakeArmLowered = true; 
+        } else {
+            this.intakeArmLowered = false; 
+        }
     }
 
     /**
@@ -44,27 +86,38 @@ public class IntakeSubsystem extends SubsystemBase {
      *
      * @param idleMode the idle mode.
      */
-    public void setIntakeMotorMode(IdleMode idleMode) {
+    public void setMecanumWheelMotorMode(IdleMode idleMode) {
         this.idleMode = idleMode;
-        leftIntakeMotor.setIdleMode(idleMode);
-        rightIntakeMotor.setIdleMode(idleMode);
+        this.mecanumWheelMotor.setIdleMode(this.idleMode); 
     }
    
     /**
      * Create a new intake subsystem.
+     * 
+     * The PID controller used by the intake arm is built in to the Spark Max motor used for 
+     * the intake arm. 
      *
      * @param leftIntake the CAN ID of the left intake motor controller.
      * @param rightIntake the CAN ID of the right intake motor controller.
      */
-    public IntakeSubsystem(int leftIntake, int rightIntake) {
-        this.leftIntakeMotor = new CANSparkMax(leftIntake, MotorType.kBrushless);
-        this.rightIntakeMotor = new CANSparkMax(rightIntake, MotorType.kBrushless);
+    public IntakeSubsystem(int mecanumWheelMotor, int intakeArmMotor) {
+        this.mecanumWheelMotor = new CANSparkMax(mecanumWheelMotor, MotorType.kBrushless);
+        this.intakeArmMotor = new CANSparkMax(intakeArmMotor, MotorType.kBrushless);
+        this.intakeArmPIDController = this.intakeArmMotor.getPIDController(); 
        
         // Invert the left motor to spin in the same direction.
-        leftIntakeMotor.setInverted(true);
-        rightIntakeMotor.setInverted(false);
+        this.mecanumWheelMotor.setInverted(true);
+        this.intakeArmMotor.setInverted(false);
 
-        leftIntakeMotor.stopMotor();
-        rightIntakeMotor.stopMotor();
+        this.mecanumWheelMotor.stopMotor();
+        this.intakeArmMotor.stopMotor(); 
+
+        intakeArmPIDController.setP(kP); 
+        intakeArmPIDController.setI(kI); 
+        intakeArmPIDController.setD(kD); 
+        intakeArmPIDController.setFF(kF); 
+
+        intakeArmPIDController.setOutputRange(-1.0, 1.0); 
+        intakeArmPIDController.setReference(0.0, ControlType.kPosition); 
     }
 }

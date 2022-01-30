@@ -166,11 +166,12 @@ public class RobotContainer {
 	}
 
 	private void configureButtonBindings() {
+		// Driving Related 
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
 		// TODO: connect to shooter data
-		
+		// Shooter Related 
 		Button shooterSpeed = new JoystickButton(operatorController, Constants.SHOOTER_SPEED_BUTTON);
 		Button deployShooter = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_BUTTON);
 		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
