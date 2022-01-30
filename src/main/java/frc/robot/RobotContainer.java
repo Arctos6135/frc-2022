@@ -25,6 +25,7 @@ import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterFeederSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,6 +37,7 @@ public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
 	private final Drivetrain drivetrain;
 	private final IntakeSubsystem intakeSubsystem;
+	private final ShooterFeederSubsystem shooterFeederSubsystem; 
 	private final Shooter shooterSubsystem;
 
 	private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER);
@@ -64,7 +66,6 @@ public class RobotContainer {
 
 	// contains subsystems, OI devices, and commands
 	public RobotContainer() {
-
 		drivetrain = new Drivetrain(Constants.RIGHT_CANSPARKMAX, Constants.LEFT_CANSPARKMAX,
 			Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
 		drivetrain.setDefaultCommand(
@@ -75,9 +76,14 @@ public class RobotContainer {
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
+		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.BOTTOM_ROLLER_MOTOR, Constants.TOP_ROLLER_MOTOR); 
+		shooterFeederSubsystem.setDefaultCommand(
+			new InstantCommand() // TODO: set to an intake/shoot command 
+		);
+
 		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
 		shooterSubsystem.setDefaultCommand(
-			new Shoot(shooterSubsystem)
+			new Shoot(shooterSubsystem, shooterFeederSubsystem)
 		);
 
 		// Shuffle Board Tabs
@@ -215,7 +221,7 @@ public class RobotContainer {
 		});
 
 		deployShooter.whileActiveOnce(
-			new Shoot(shooterSubsystem)
+			new Shoot(shooterSubsystem, shooterFeederSubsystem)
 			// TODO: check if shooter is ready in the Shoot command
 		); 
 

@@ -3,20 +3,25 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterFeederSubsystem;
 
 public class Shoot extends CommandBase {
     
     private static final double VELOCITY_TOLERANCE = 100; // TODO: will probably change 
+    
     private final Shooter shooter; 
+    private final ShooterFeederSubsystem shooterFeederSubsystem; 
 
     private double targetVelocity = 0; 
     private boolean velocityReached = false; 
 
     private boolean finished = false; 
 
-    public Shoot(Shooter shooter) {
+    public Shoot(Shooter shooter, ShooterFeederSubsystem shooterFeederSubsystem) {
         this.shooter = shooter; 
-        addRequirements(shooter);
+        this.shooterFeederSubsystem = shooterFeederSubsystem; 
+
+        addRequirements(shooter, shooterFeederSubsystem);
     }
 
     @Override 
