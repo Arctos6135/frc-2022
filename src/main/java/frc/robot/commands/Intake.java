@@ -26,7 +26,9 @@ public class Intake extends CommandBase {
         boolean reverse = controller.getRawButton(reverseButton);
 
         if (forward & !reverse) {
+            // TODO: lower arm 
             intakeSubsystem.setIntakeMotors(1.0);
+            // TODO: lower arm 
         } else if (!forward & reverse) {
             intakeSubsystem.setIntakeMotors(-1.0);
         } else {
@@ -36,7 +38,7 @@ public class Intake extends CommandBase {
 
     @Override
     public void initialize() {
-
+        
     }
    
     @Override
