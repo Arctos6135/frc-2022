@@ -17,6 +17,8 @@ public class ShooterFeederSubsystem extends SubsystemBase {
 
     private double rollSpeed = 0; 
     private boolean rollUpwards = true; 
+    private boolean ballInShotPosition = false; 
+    private int ballCount = 0; 
 
     public ShooterFeederSubsystem(int rollerMotor) {
         this.rollerMotor = new CANSparkMax(rollerMotor, MotorType.kBrushless); 
@@ -24,6 +26,7 @@ public class ShooterFeederSubsystem extends SubsystemBase {
 
         this.colorSensor = new ColorSensorV3(I2C.Port.kOnboard); 
         this.rollSpeed = Constants.ROLL_SPEED; 
+        this.ballCount = 0; 
     }
 
     /**
@@ -100,6 +103,48 @@ public class ShooterFeederSubsystem extends SubsystemBase {
      */
     public void toggleRollDirection() {
         this.rollUpwards = !this.rollUpwards;
+    }
+
+    /**
+     * Get whether the ball has been sensed by the color sensor and is ready to shoot. 
+     * 
+     * @return whether there is a ball ready to shoot. 
+     */
+    public boolean getBallInShotPosition() {
+        return this.ballInShotPosition; 
+    }
+
+    /**
+     * Set whether the ball has been sensed by the color sensor and is ready to shoot. 
+     * 
+     * @param ballInShotPosition whether there is a ball ready to shoot. 
+     */
+    public void setBallInShotPosition(boolean ballInShotPosition) {
+        this.ballInShotPosition = ballInShotPosition; 
+    }
+
+    /**
+     * Get the number of balls currently in the roll shaft. 
+     * The robot can hold a maximum of 2 balls at a time. 
+     * 
+     * @return the current number of balls in the roll shaft. 
+     */
+    public int getBallCount() {
+        return this.ballCount; 
+    }
+
+    /**
+     * Add one ball to the number of balls counted in the roll shaft. 
+     */
+    public void incrementBallCount() {
+        this.ballCount++; 
+    }
+
+    /**
+     * Subtract one ball to the number of balls counted in the roll shaft. 
+     */
+    public void decrementBallCount() {
+        this.ballCount--; 
     }
 
 }

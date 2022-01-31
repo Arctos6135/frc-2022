@@ -20,6 +20,7 @@ public class Shoot extends CommandBase {
     public Shoot(Shooter shooter, ShooterFeederSubsystem shooterFeederSubsystem) {
         this.shooter = shooter; 
         this.shooterFeederSubsystem = shooterFeederSubsystem; 
+        shooterFeederSubsystem.setRollDirection(true);
 
         addRequirements(shooter, shooterFeederSubsystem);
     }
@@ -39,17 +40,29 @@ public class Shoot extends CommandBase {
 
     @Override 
     public void execute() {
-        if (Math.abs(shooter.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE) {
-            // Shoot the ball 
-            velocityReached = true; 
+        // Check if a ball is in the feeder. 
+        if (!this.shooterFeederSubsystem.getBallInShotPosition()) {
+            finished = true; 
+            RobotContainer.getLogger().logError("Shooter has no ball to shoot."); 
         } else {
-            // Stop feeding balls 
+            if (Math.abs(shooter.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE) {
+                // Shoot the ball 
+                velocityReached = true; 
+                shooterFeederSubsystem.startRoller(); 
 
-            // A ball was shot 
-            if (velocityReached) {
+            } else {
+                // Stop feeding balls 
+                shooterFeederSubsystem.stopRoller();
+                // A ball was shot 
+                if (velocityReached) {
+                    shooterFeederSubsystem.decrementBallCount();
+                }
 
+                velocityReached = false; 
             }
         }
+
+            
     }
 
     @Override 

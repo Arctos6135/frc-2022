@@ -9,7 +9,7 @@ import frc.robot.subsystems.ShooterFeederSubsystem;
 
 /**
  * Using the Shooter Feeder mechanism, roll a ball up the shaft using the feeder belts until 
- * the ball is sensed by the color sensor. 
+ * the ball is sensed by the color sensor. The compression of the ball should keep it from falling.
  * 
  * Note that this command is a rough sketch of how the actual command will function.
  */
@@ -19,7 +19,6 @@ public class SensoredRoll extends CommandBase {
     private ColorMatch colorMatch; 
     private Color detectedColor;
     private ColorMatchResult matchedColor; 
-    private boolean ballSensed = false; 
 
     public SensoredRoll(ShooterFeederSubsystem shooterFeederSubsystem) {
         this.shooterFeederSubsystem = shooterFeederSubsystem; 
@@ -34,24 +33,26 @@ public class SensoredRoll extends CommandBase {
     @Override 
     public void initialize() {
         shooterFeederSubsystem.setRollDirection(true);
-        shooterFeederSubsystem.startRoller();
+        shooterFeederSubsystem.startRoller(); 
     }
 
     @Override 
     public void execute() {
         detectedColor = this.shooterFeederSubsystem.getColorDetected(); 
-
         matchedColor = colorMatch.matchClosestColor(detectedColor); 
         
         // Assumes that we are in allicance BLUE 
         if (matchedColor.color == Color.kBlue) {
             // Shoot the ball 
             shooterFeederSubsystem.stopRoller();
-            ballSensed = true; 
+            shooterFeederSubsystem.setBallInShotPosition(true);
+            shooterFeederSubsystem.incrementBallCount();
         } else if (matchedColor.color == Color.kRed) {
             // Outtake the ball 
             shooterFeederSubsystem.setRollDirection(false);
             shooterFeederSubsystem.startRoller(); 
+        } else {
+            shooterFeederSubsystem.setBallInShotPosition(false); 
         }
     }
 
@@ -62,6 +63,6 @@ public class SensoredRoll extends CommandBase {
 
     @Override 
     public boolean isFinished() { 
-        return this.ballSensed; 
+        return this.shooterFeederSubsystem.getBallInShotPosition(); 
     }
 }

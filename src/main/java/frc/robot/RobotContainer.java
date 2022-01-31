@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Intake;
+import frc.robot.commands.SensoredRoll; 
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
@@ -79,7 +79,7 @@ public class RobotContainer {
 
 		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.ROLLER_MOTOR); 
 		shooterFeederSubsystem.setDefaultCommand(
-			new InstantCommand() // TODO: set to an intake/shoot command 
+			new SensoredRoll(shooterFeederSubsystem) 
 		);
 
 		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
@@ -136,6 +136,14 @@ public class RobotContainer {
 			Constants.MOTOR_SHUTOFF_TEMP = notif.value.getDouble();
 				}, EntryListenerFlags.kUpdate);
 				
+		// Write Settings of Spark Max Motors on Drivetrain and Shooter 
+		InstantCommand burnFlashCommand = new InstantCommand(() -> {
+			drivetrain.burnFlash(); 
+			shooterSubsystem.burnFlash(); 
+		}); 
+		burnFlashCommand.setName("Burn Flash");
+		configTab.add("Burn Spark Motors", burnFlashCommand).withWidget(BuiltInWidgets.kCommand).withPosition(36, 0); 
+
 		// Drive Tabs
 		driveTab.add("Gyro", drivetrain.getAHRS()).withWidget(BuiltInWidgets.kGyro).withPosition(0, 4).withSize(9, 10);
 
