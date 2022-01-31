@@ -25,6 +25,7 @@ import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Shooter;
+import frc.robot.util.SendableCANPIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -127,14 +128,19 @@ public class RobotContainer {
 		.addListener(notif -> {
 			Constants.MOTOR_SHUTOFF_TEMP = notif.value.getDouble();
 				}, EntryListenerFlags.kUpdate);
+
+		configTab.add("Shooter PID", new SendableCANPIDController(shooterSubsystem.getPIDController())).withWidget(BuiltInWidgets.kPIDController)
+		.withPosition(6, 4).withSize(6, 12);
 				
 		// Drive Tabs
 		driveTab.add("Gyro", drivetrain.getAHRS()).withWidget(BuiltInWidgets.kGyro).withPosition(0, 4).withSize(9, 10);
 
 		// Driving Related Entries
-		driveReversedEntry = driveTab.add("Reversed", TeleopDrive.isReversed()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(0, 0).withSize(4, 4).getEntry();
+		driveReversedEntry = driveTab.add("Reversed", TeleopDrive.isReversed()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(0, 0)
+		.withSize(4, 4).getEntry();
 		
-		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(4, 0).withSize(4, 4).getEntry();
+		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
+		.withPosition(4, 0).withSize(4, 4).getEntry();
 		
 		// Overheating Warnings
 		drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {

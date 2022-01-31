@@ -15,5 +15,6 @@
 		"**/*~": true,
 	
 	},
-	"editor.tabSize": 8
+	"editor.tabSize": 4, 
+	"editor.autoIndent": "brackets"
 }
