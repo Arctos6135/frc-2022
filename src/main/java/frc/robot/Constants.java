@@ -27,6 +27,7 @@ public final class Constants {
 	// Shooter Feeder Motors 
 	// TODO: change when electrical is done 
 	public static final int ROLLER_MOTOR = 0; 
+	public static final double ROLL_SPEED = 0.5; 
 
 	// SPARK MAX Encoders (in inches)
 	public static final double WHEEL_DIAMETER = 4.;
