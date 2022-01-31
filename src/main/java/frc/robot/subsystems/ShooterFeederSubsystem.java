@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -13,7 +14,7 @@ public class ShooterFeederSubsystem extends SubsystemBase {
     
     private final CANSparkMax rollerMotor;
     private final ColorSensorV3 colorSensor; 
-    
+
     private double rollSpeed = 0; 
     private boolean rollUpwards = true; 
 
@@ -34,16 +35,20 @@ public class ShooterFeederSubsystem extends SubsystemBase {
         return this.colorSensor; 
     }
 
+    public Color getColorDetected() {
+        return this.colorSensor.getColor();
+    }
+
     /**
      * Start rolling the flat belts to move balls upwards. 
      * 
      * @param rollSpeed speed of the roller motors. 
      */
-    public void startRoller(int rollSpeed) {
+    public void startRoller() {
         if (rollUpwards) {
-            rollerMotor.set(rollSpeed); 
+            rollerMotor.set(this.rollSpeed); 
         } else {
-            rollerMotor.set(-rollSpeed); 
+            rollerMotor.set(-this.rollSpeed); 
         }
     }
 

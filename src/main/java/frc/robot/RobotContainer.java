@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TeleopDrive;
@@ -46,6 +46,7 @@ public class RobotContainer {
 	// Shuffleboard Tabs
 	final ShuffleboardTab configTab;
 	final ShuffleboardTab driveTab;
+	final ShuffleboardTab colorTab; 
 	final ShuffleboardTab prematchTab;
 	final ShuffleboardTab debugTab;
 
@@ -89,6 +90,7 @@ public class RobotContainer {
 		// Shuffle Board Tabs
 		configTab = Shuffleboard.getTab("Config");
 		driveTab = Shuffleboard.getTab("Drive");
+		colorTab = Shuffleboard.getTab("Color"); 
 		prematchTab = Shuffleboard.getTab("Pre-match");
 		debugTab = Shuffleboard.getTab("Debug");
 
@@ -142,6 +144,11 @@ public class RobotContainer {
 		
 		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox).withPosition(4, 0).withSize(4, 4).getEntry();
 		
+		// Color Detection of Balls 
+		colorTab.add("Red Color", shooterFeederSubsystem.getColorSensor().getRed());
+		colorTab.add("Blue Color", shooterFeederSubsystem.getColorSensor().getBlue());
+		colorTab.add("Unknown Color", shooterFeederSubsystem.getColorSensor().getIR()); 
+
 		// Overheating Warnings
 		drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
 			if (!drivetrain.getOverheatShutoffOverride()) {
