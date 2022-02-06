@@ -17,14 +17,15 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-
 import frc.robot.commands.Intake;
+import frc.robot.commands.SensoredRoll; 
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.util.SendableCANPIDController;
+import frc.robot.subsystems.ShooterFeederSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -36,6 +37,7 @@ public class RobotContainer {
 	// The robot's subsystems and commands are defined here...
 	private final Drivetrain drivetrain;
 	private final IntakeSubsystem intakeSubsystem;
+	private final ShooterFeederSubsystem shooterFeederSubsystem; 
 	private final Shooter shooterSubsystem;
 
 	private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER);
@@ -44,6 +46,7 @@ public class RobotContainer {
 	// Shuffleboard Tabs
 	final ShuffleboardTab configTab;
 	final ShuffleboardTab driveTab;
+	final ShuffleboardTab colorTab; 
 	final ShuffleboardTab prematchTab;
 	final ShuffleboardTab debugTab;
 
@@ -64,7 +67,6 @@ public class RobotContainer {
 
 	// contains subsystems, OI devices, and commands
 	public RobotContainer() {
-
 		drivetrain = new Drivetrain(Constants.RIGHT_CANSPARKMAX, Constants.LEFT_CANSPARKMAX,
 			Constants.RIGHT_CANSPARKMAX_FOLLOWER, Constants.LEFT_CANSPARKMAX_FOLLOWER);
 		drivetrain.setDefaultCommand(
@@ -75,15 +77,21 @@ public class RobotContainer {
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
+		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.ROLLER_MOTOR); 
+		shooterFeederSubsystem.setDefaultCommand(
+			new SensoredRoll(shooterFeederSubsystem) 
+		);
+
 		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
 		shooterSubsystem.setDefaultCommand(
 			// Shoot for the lower hub
-			new Shoot(shooterSubsystem, true)
+			new Shoot(shooterSubsystem, shooterFeederSubsystem, true)
 		);
 
 		// Shuffle Board Tabs
 		configTab = Shuffleboard.getTab("Config");
 		driveTab = Shuffleboard.getTab("Drive");
+		colorTab = Shuffleboard.getTab("Color"); 
 		prematchTab = Shuffleboard.getTab("Pre-match");
 		debugTab = Shuffleboard.getTab("Debug");
 
@@ -132,6 +140,14 @@ public class RobotContainer {
 		configTab.add("Shooter PID", new SendableCANPIDController(shooterSubsystem.getPIDController())).withWidget(BuiltInWidgets.kPIDController)
 		.withPosition(6, 4).withSize(6, 12);
 				
+		// Write Settings of Spark Max Motors on Drivetrain and Shooter 
+		InstantCommand burnFlashCommand = new InstantCommand(() -> {
+			drivetrain.burnFlash(); 
+			shooterSubsystem.burnFlash(); 
+		}); 
+		burnFlashCommand.setName("Burn Flash");
+		configTab.add("Burn Spark Motors", burnFlashCommand).withWidget(BuiltInWidgets.kCommand).withPosition(36, 0); 
+
 		// Drive Tabs
 		driveTab.add("Gyro", drivetrain.getAHRS()).withWidget(BuiltInWidgets.kGyro).withPosition(0, 4).withSize(9, 10);
 
@@ -142,6 +158,11 @@ public class RobotContainer {
 		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
 		.withPosition(4, 0).withSize(4, 4).getEntry();
 		
+		// Color Detection of Balls 
+		colorTab.add("Red Color", shooterFeederSubsystem.getColorSensor().getRed());
+		colorTab.add("Blue Color", shooterFeederSubsystem.getColorSensor().getBlue());
+		colorTab.add("Unknown Color", shooterFeederSubsystem.getColorSensor().getIR()); 
+
 		// Overheating Warnings
 		drivetrain.getMonitorGroup().setOverheatShutoffCallback((motor, temp) -> {
 			if (!drivetrain.getOverheatShutoffOverride()) {
@@ -172,11 +193,13 @@ public class RobotContainer {
 	}
 
 	private void configureButtonBindings() {
+		// Driving Related 
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
 		// TODO: connect to shooter data
 		
+		// Shooter Related 
 		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
 		Button deployShooterLower = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_LOWER_BUTTON);
 		Button deployShooterUpper = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_UPPER_BUTTON);
@@ -214,11 +237,11 @@ public class RobotContainer {
 		});
 
 		deployShooterLower.whenActive(() -> {
-			new Shoot(shooterSubsystem, true); 
+			new Shoot(shooterSubsystem, shooterFeederSubsystem, true); 
 		});
 
 		deployShooterUpper.whenActive(() -> {
-			new Shoot(shooterSubsystem, false); 
+			new Shoot(shooterSubsystem, shooterFeederSubsystem, false); 
 		});
 	}
 

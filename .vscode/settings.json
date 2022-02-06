@@ -15,6 +15,10 @@
 		"**/*~": true,
 	
 	},
+<<<<<<< HEAD
 	"editor.tabSize": 4, 
 	"editor.autoIndent": "brackets"
+=======
+	"editor.tabSize": 4
+>>>>>>> intake
 }

@@ -17,8 +17,17 @@ public final class Constants {
 	public static final int AUXILLIARY_SHOOTER_MOTOR = 6;
 
 	// Intake Motors
+	// TODO: change when attached to PDP 
 	public static final int LEFT_INTAKE_MOTOR = 0;
 	public static final int RIGHT_INTAKE_MOTOR = 0;
+
+	public static final double INTAKE_ARM_LOWERED = 1.2; 
+	public static final double INTAKE_ARM_RAISED = 0; 
+
+	// Shooter Feeder Motors 
+	// TODO: change when electrical is done 
+	public static final int ROLLER_MOTOR = 0; 
+	public static final double ROLL_SPEED = 0.5; 
 
 	// SPARK MAX Encoders (in inches)
 	public static final double WHEEL_DIAMETER = 4.;
@@ -70,7 +79,8 @@ public final class Constants {
 	public static final int COLOR_MOTOR_SHUTOFF = 0xFF0000FF;
 	public static final int COLOR_MOTOR_OVERRIDDEN = 0xA72DFFFF;
 
-	// hub heights
+	// hub heights 
+	// TODO: check if Limelight does measurements in inches 
 	public static final double LOWER_HUB = 48.;
 	public static final double UPPER_HUB = 120.;
 

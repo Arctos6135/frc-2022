@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.IntakeSubsystem;
 
 // TODO: intake system has a moving arm, will need to add to the subsystem
@@ -25,13 +26,14 @@ public class Intake extends CommandBase {
         boolean reverse = controller.getRawButton(reverseButton);
 
         if (forward & !reverse) {
-            // TODO: lower arm 
-            intakeSubsystem.setIntakeMotors(1.0);
-            // TODO: lower arm 
+            intakeSubsystem.setMecanumWheelMotor(1.0);
+            intakeSubsystem.setIntakeArmPosition(Constants.INTAKE_ARM_LOWERED);
         } else if (!forward & reverse) {
-            intakeSubsystem.setIntakeMotors(-1.0);
+            intakeSubsystem.setMecanumWheelMotor(-1.0);
+            intakeSubsystem.setIntakeArmPosition(Constants.INTAKE_ARM_RAISED); 
         } else {
-            intakeSubsystem.setIntakeMotors(0);
+            intakeSubsystem.setMecanumWheelMotor(0);
+            intakeSubsystem.setIntakeArmPosition(Constants.INTAKE_ARM_RAISED); 
         }
     }
 
@@ -42,7 +44,8 @@ public class Intake extends CommandBase {
    
     @Override
     public void end(boolean interrupted) {
-        intakeSubsystem.setIntakeMotors(0);
+        intakeSubsystem.setIntakeArmPosition(Constants.INTAKE_ARM_RAISED); 
+        intakeSubsystem.setMecanumWheelMotor(0);
     }
    
     @Override

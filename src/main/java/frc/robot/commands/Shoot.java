@@ -3,11 +3,14 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.ShooterFeederSubsystem;
 
 public class Shoot extends CommandBase {
     
     private static final double VELOCITY_TOLERANCE = 100; // TODO: will probably change 
+    
     private final Shooter shooter; 
+    private final ShooterFeederSubsystem shooterFeederSubsystem; 
 
     private double targetVelocity = 0; 
     private boolean velocityReached = false; 
@@ -15,10 +18,13 @@ public class Shoot extends CommandBase {
 
     private boolean finished = false; 
 
-    public Shoot(Shooter shooter, boolean lowerHub) {
+    public Shoot(Shooter shooter, ShooterFeederSubsystem shooterFeederSubsystem, boolean lowerHub) {
         this.shooter = shooter; 
+        this.shooterFeederSubsystem = shooterFeederSubsystem; 
+        shooterFeederSubsystem.setRollDirection(true);
         this.lowerHub = lowerHub; 
-        addRequirements(shooter);
+
+        addRequirements(shooter, shooterFeederSubsystem);
     }
 
     @Override 
@@ -35,40 +41,37 @@ public class Shoot extends CommandBase {
 
     @Override 
     public void execute() {
-        if (Math.abs(shooter.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE) {
+        if (Math.abs(shooter.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE && shooterFeederSubsystem.getBallInShotPosition()) {
             // Shoot the ball 
             velocityReached = true; 
 
-            if (lowerHub && shooter.shooterReady) {
-                try {
-                    shooter.fire(false); 
-                } catch (Shooter.PowerException exception) {
-                    RobotContainer.getLogger().logError("THe shooter motor cannot support the lower hub shot!");
-                }
-            } else if (!lowerHub && shooter.shooterReady) {
-                try {
-                    shooter.fire(true); 
-                } catch (Shooter.PowerException exception) {
-                    RobotContainer.getLogger().logError("The shooter motor cannot support the upper hub shot!"); 
+            if (shooter.shooterReady) {
+                shooterFeederSubsystem.startRoller();
+
+                if (lowerHub) {
+                    try {
+                        shooter.fire(false); 
+                    } catch (Shooter.PowerException exception) {
+                        RobotContainer.getLogger().logError("THe shooter motor cannot support the lower hub shot!");
+                    }
+                } else {
+                    try {
+                        shooter.fire(true); 
+                    } catch (Shooter.PowerException exception) {
+                        RobotContainer.getLogger().logError("The shooter motor cannot support the upper hub shot!"); 
+                    }
                 }
             } else {
                 RobotContainer.getLogger().logError("The shooter is not ready to shoot any shot!"); 
             }
-            
-        } else {
-            // Stop feeding balls 
-
-            // A ball was shot 
-            if (velocityReached) {
-
-            }
-        }
+        }   
     }
 
     @Override 
     public void end(boolean interrupted) {
         // Stop the feeder 
         shooter.setVelocity(0);
+        shooterFeederSubsystem.stopRoller(); 
     }
 
     @Override 
