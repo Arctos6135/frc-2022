@@ -11,11 +11,13 @@ public class Shoot extends CommandBase {
 
     private double targetVelocity = 0; 
     private boolean velocityReached = false; 
+    private boolean lowerHub; 
 
     private boolean finished = false; 
 
-    public Shoot(Shooter shooter) {
+    public Shoot(Shooter shooter, boolean lowerHub) {
         this.shooter = shooter; 
+        this.lowerHub = lowerHub; 
         addRequirements(shooter);
     }
 
@@ -29,7 +31,6 @@ public class Shoot extends CommandBase {
             finished = true; 
             RobotContainer.getLogger().logError("Shooter is overheating, cannot shoot."); 
         }
-
     }
 
     @Override 
@@ -37,6 +38,23 @@ public class Shoot extends CommandBase {
         if (Math.abs(shooter.getVelocity() - targetVelocity) < VELOCITY_TOLERANCE) {
             // Shoot the ball 
             velocityReached = true; 
+
+            if (lowerHub && shooter.shooterReady) {
+                try {
+                    shooter.fire(false); 
+                } catch (Shooter.PowerException exception) {
+                    RobotContainer.getLogger().logError("THe shooter motor cannot support the lower hub shot!");
+                }
+            } else if (!lowerHub && shooter.shooterReady) {
+                try {
+                    shooter.fire(true); 
+                } catch (Shooter.PowerException exception) {
+                    RobotContainer.getLogger().logError("The shooter motor cannot support the upper hub shot!"); 
+                }
+            } else {
+                RobotContainer.getLogger().logError("The shooter is not ready to shoot any shot!"); 
+            }
+            
         } else {
             // Stop feeding balls 
 

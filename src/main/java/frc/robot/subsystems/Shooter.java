@@ -29,6 +29,12 @@ public class Shooter extends SubsystemBase {
 
 	static final double kP = 0, kI = 0, kD = 0, kF = 0;
 
+	/**
+	 * Creates new instance of the shooter subsystem. 
+
+	 * @param masterMotor the PDP pin of the motor for the top shooter wheel.
+	 * @param followerMotor the PDP pin of the motor for the bottom shooter wheel. 
+	 */
 	public Shooter(int masterMotor, int followerMotor) {
 		this.masterShooterMotor = new CANSparkMax(masterMotor, MotorType.kBrushless);
 		this.followerShooterMotor = new CANSparkMax(followerMotor, MotorType.kBrushless);
@@ -57,38 +63,78 @@ public class Shooter extends SubsystemBase {
 		pidController.setReference(0.0, ControlType.kVelocity);
 	}
 
+	/**
+	 * Get the encoder used to measure velocity (in rpm). 
+	 *
+	 * @return the built in motor encoder on the shooter motor. 
+	 */
 	public CANEncoder getEncoder() {
 		return this.shooterEncoder;
 	}
 
 	// angular velocities must be converted from rpm
-
+	
+	/**
+	 * Get the velocity that the shooter wheels are spinning at. 
+	 *
+	 * @return the shooter velocity measured by the encoder. 
+	 */
 	public double getVelocity() {
 		return this.shooterEncoder.getVelocity();
 	}
 
+	/**
+	 * Get the desired velocity of the shooter wheels. 
+	 *
+	 * @return the desired velocity that the PID controller will use.
+	 */
 	public double getVelocitySetpoint() {
 		return this.velocity;
 	}
 
+	/**
+	 * Set the velocity of the shooter using PID control. 
+
+	 * @param rpm the desired velocity of the shooter. 
+	 */
 	public void setVelocity(double rpm) {
 		this.pidController.setReference(monitorGroup.getOverheatShutoff() && !protectionOverridden
 		? 0 : rpm, ControlType.kVelocity);
-		this.velocity = rpm*Math.pi/180;
+		this.velocity = rpm*Math.PI/180;
 	}
 
+	/**
+	 * Get the PID controller of the shooter. 
+	 *
+	 * @return the PID controller of the shooter motor. 
+	 */
 	public CANPIDController getPIDController() {
 		return this.pidController;
 	}
 
+	/**
+	 * Get the monitor group for the shooter motors. 
+	 *
+	 * @return the monitor group for the shooter motors. 
+	 */
 	public MonitoredCANSparkMaxGroup getMonitorGroup() {
 		return this.monitorGroup;
 	}
 
+	/**
+	 * Get whether the overheating protection has been overridden. 
+	 *
+	 * @return whether the overheating protection has been overridden. 
+	 */
 	public boolean getOverheatShutoffOverride() {
 		return this.protectionOverridden;
 	}
 
+	/**
+	 * Set whether the overheating protection has been overridden. 
+	 *
+	 * @param protectionOverridden whether the overheating protection has been overridden. 
+	 */
 	public void setOverheatShutoffOverride(boolean protectionOverridden) {
 		this.protectionOverridden = protectionOverridden;
 	}
@@ -103,7 +149,7 @@ public class Shooter extends SubsystemBase {
 		}
 	}
 
-	// settings of the shooter SPARK MAX motors.
+	// Settings of the shooter SPARK MAX motors.
 	public void burnFlash() {
 		masterShooterMotor.burnFlash();
 		followerShooterMotor.burnFlash();
@@ -115,7 +161,27 @@ public class Shooter extends SubsystemBase {
 		return 1.132*9.807*x*x/(1.926*x-y)*Constants.BALL_MASS;
 	}
 
-	public class PowerException extends Exception {}
+	/**
+	 * A custom exception that is thrown when the shooter motors cannot handle 
+	 * the amount of power passed to it. 
+	 */
+	public static class PowerException extends Exception {
+		public PowerException() {
+			super(); 
+		}
+
+		public PowerException(String msg) {
+			super(msg); 
+		}
+
+		public PowerException(Throwable cause) {
+			super(cause); 
+		}
+
+		public PowerException(String msg, Throwable cause) {
+			super(msg, cause); 
+		}
+	}
 
 	public void fire(boolean upper) throws PowerException {
 		double power = shooterDistToPower(shooterDist, upper ? Constants.UPPER_HUB : Constants.LOWER_HUB);
@@ -127,7 +193,7 @@ public class Shooter extends SubsystemBase {
 		 * feel free to change from 33;
 		 * it's just a rough estimate based on a uniform wheel
 		 */
-		if (power > 33) throw PowerException("NEO cannot support a throw that far");
+		if (power > 33) throw new PowerException("NEO cannot support a throw that far");
 		masterShooterMotor.set(power/33);
 	}
 }

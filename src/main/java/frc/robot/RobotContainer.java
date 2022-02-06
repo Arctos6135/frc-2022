@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -78,7 +77,8 @@ public class RobotContainer {
 
 		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
 		shooterSubsystem.setDefaultCommand(
-			new Shoot(shooterSubsystem)
+			// Shoot for the lower hub
+			new Shoot(shooterSubsystem, true)
 		);
 
 		// Shuffle Board Tabs
@@ -177,9 +177,9 @@ public class RobotContainer {
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
 		// TODO: connect to shooter data
 		
-		Button shooterSpeed = new JoystickButton(operatorController, Constants.SHOOTER_SPEED_BUTTON);
-		Button deployShooter = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_BUTTON);
 		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
+		Button deployShooterLower = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_LOWER_BUTTON);
+		Button deployShooterUpper = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_UPPER_BUTTON);
 		
 		AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
 
@@ -208,34 +208,18 @@ public class RobotContainer {
 			}
 		});
 
-		shooterSpeed.whileHeld(() -> {
-			// 10.16 cm radius of wheel
-			shooterSubsystem.shooterSpeed = shooterSubsystem.getVelocity()*10.16*Math.pi/120;
-		}); 
-
 		// TODO: prepare shooter
-		prepareShooter.whenPressed(() ->
+		prepareShooter.whenPressed(() -> {
 			shooterSubsystem.shooterReady = true;
-		);
-
-		deployShooterLower.whileActiveOnce(() -> {
-			try {
-				if (shooterSubsystem.shooterReady) 	
-					shooterSubsystem.fire(false);
-			} catch (shooterSubsystem.PowerException e) {
-				//TODO: handle exception
-			}
 		});
 
-		deployShooterUpper.whileActiveOnce(() -> {
-			try {
-				if (shooterSubsystem.shooterReady)
-					shooterSubsystem.fire(true);
-			} catch (shooterSubsystem.PowerException e) {
-				//TODO: handle exception
-			}
+		deployShooterLower.whenActive(() -> {
+			new Shoot(shooterSubsystem, true); 
 		});
 
+		deployShooterUpper.whenActive(() -> {
+			new Shoot(shooterSubsystem, false); 
+		});
 	}
 
 	public Command getAutonomousCommand() {

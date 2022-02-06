@@ -49,8 +49,10 @@ public final class Constants {
 	// Operator Controller 
 	public static final int XBOX_OPERATOR = 1;
 	public static final int SHOOTER_SPEED_BUTTON = XboxController.Button.kB.value; 
-	public static final int DEPLOY_SHOOTER_BUTTON = XboxController.Button.kX.value;
+	public static final int DEPLOY_SHOOTER_LOWER_BUTTON = XboxController.Button.kX.value;
+	public static final int DEPLOY_SHOOTER_UPPER_BUTTON = XboxController.Button.kY.value;
 	public static final int PREPARE_SHOOTER_BUTTON = XboxController.Button.kA.value; 
+
     
 	// Robot Dimensions
 	// TODO: change these to match robot
