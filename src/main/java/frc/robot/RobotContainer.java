@@ -209,20 +209,32 @@ public class RobotContainer {
 		});
 
 		shooterSpeed.whileHeld(() -> {
-			// modify to multiply by some constant, post-assembly.
-			// shooterSubsystem.shooterSpeed = shooterSubsystem.getVelocity();
-
+			// 10.16 cm radius of wheel
+			shooterSubsystem.shooterSpeed = shooterSubsystem.getVelocity()*10.16*Math.pi/120;
 		}); 
 
-		prepareShooter.whenPressed(() -> {
-			// prepare shooter
+		// TODO: prepare shooter
+		prepareShooter.whenPressed(() ->
 			shooterSubsystem.shooterReady = true;
+		);
+
+		deployShooterLower.whileActiveOnce(() -> {
+			try {
+				if (shooterSubsystem.shooterReady) 	
+					shooterSubsystem.fire(false);
+			} catch (shooterSubsystem.PowerException e) {
+				//TODO: handle exception
+			}
 		});
 
-		deployShooter.whileActiveOnce(
-			new Shoot(shooterSubsystem)
-			// TODO: check if shooter is ready in the Shoot command
-		); 
+		deployShooterUpper.whileActiveOnce(() -> {
+			try {
+				if (shooterSubsystem.shooterReady)
+					shooterSubsystem.fire(true);
+			} catch (shooterSubsystem.PowerException e) {
+				//TODO: handle exception
+			}
+		});
 
 	}
 
