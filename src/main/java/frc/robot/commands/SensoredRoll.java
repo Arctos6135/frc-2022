@@ -26,8 +26,8 @@ public class SensoredRoll extends CommandBase {
 
         colorMatch.addColorMatch(Color.kBlue); 
         colorMatch.addColorMatch(Color.kRed); 
-
-        // TODO: add color of whatever the color sensor is facing 
+        colorMatch.addColorMatch(Color.kWhite); 
+        // TODO: add color of whatever the color sensor is facing (for now it is white)
     }
 
     @Override 
@@ -44,7 +44,6 @@ public class SensoredRoll extends CommandBase {
         // Assumes that we are in allicance BLUE 
         if (matchedColor.color == Color.kBlue) {
             // Shoot the ball 
-            shooterFeederSubsystem.stopRoller();
             shooterFeederSubsystem.setBallInShotPosition(true);
             shooterFeederSubsystem.incrementBallCount();
         } else if (matchedColor.color == Color.kRed) {

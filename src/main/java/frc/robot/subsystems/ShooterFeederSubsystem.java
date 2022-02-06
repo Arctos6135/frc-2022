@@ -38,6 +38,11 @@ public class ShooterFeederSubsystem extends SubsystemBase {
         return this.colorSensor; 
     }
 
+    /**
+     * Get the color detected by the color sensor. 
+     *
+     * @return the color detected by the color sensor. 
+     */
     public Color getColorDetected() {
         return this.colorSensor.getColor();
     }

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
@@ -52,7 +53,7 @@ public class Shoot extends CommandBase {
                     try {
                         shooter.fire(false); 
                     } catch (Shooter.PowerException exception) {
-                        RobotContainer.getLogger().logError("THe shooter motor cannot support the lower hub shot!");
+                        RobotContainer.getLogger().logError("The shooter motor cannot support the lower hub shot!");
                     }
                 } else {
                     try {
@@ -64,7 +65,13 @@ public class Shoot extends CommandBase {
             } else {
                 RobotContainer.getLogger().logError("The shooter is not ready to shoot any shot!"); 
             }
-        }   
+        } else {
+            shooterFeederSubsystem.stopRoller(); 
+
+            if (velocityReached) {
+                shooterFeederSubsystem.decrementBallCount(); 
+            }
+        }
     }
 
     @Override 
