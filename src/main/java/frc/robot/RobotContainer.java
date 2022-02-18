@@ -18,10 +18,12 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import frc.robot.commands.Intake;
-import frc.robot.commands.SensoredRoll; 
 import frc.robot.commands.Shoot;
-import frc.robot.commands.TeleopDrive;
 import frc.robot.commands.climbing.Climb;
+import frc.robot.commands.climbing.DriveRaise;
+import frc.robot.commands.driving.TeleopDrive;
+import frc.robot.commands.indexer.TeleopRoll;
+import frc.robot.commands.indexer.SensoredRoll;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -79,13 +81,13 @@ public class RobotContainer {
 			new TeleopDrive(drivetrain, driverController, Constants.DRIVE_FWD_REV, Constants.DRIVE_LEFT_RIGHT));
 
 		intakeSubsystem = new IntakeSubsystem(Constants.LEFT_INTAKE_MOTOR, Constants.RIGHT_INTAKE_MOTOR);
-		intakeSubsystem.setDefaultCommand(
+		intakeSubsystem.setDefaultCommand( 
 			new Intake(intakeSubsystem, driverController, Constants.INTAKE_FORWARD_BUTTON, Constants.INTAKE_REVERSE_BUTTON)
 		);
 
 		shooterFeederSubsystem = new ShooterFeederSubsystem(Constants.ROLLER_MOTOR); 
 		shooterFeederSubsystem.setDefaultCommand(
-			new SensoredRoll(shooterFeederSubsystem) 
+			new TeleopRoll(shooterFeederSubsystem, operatorController) 
 		);
 
 		shooterSubsystem = new Shooter(Constants.MAIN_SHOOTER_MOTOR, Constants.AUXILLIARY_SHOOTER_MOTOR);
@@ -233,11 +235,13 @@ public class RobotContainer {
 		Button deployShooterUpperButton = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_UPPER_BUTTON);
 
 		// Shooter Feeder Related 
-		Button rollUpwardsButton = new JoystickButton(operatorController, Constants.ROLL_UPWARDS); 
-		Button rollDownwardsButton = new JoystickButton(operatorController, Constants.ROLL_DOWNWARDS); 
+		// Button rollUpwardsButton = new JoystickButton(operatorController, Constants.ROLL_UPWARDS); 
+		// Button rollDownwardsButton = new JoystickButton(operatorController, Constants.ROLL_DOWNWARDS); 
 
 		// Climb Related
 		Button overrideClimbTime = new JoystickButton(operatorController, Constants.CLIMB_TIME_OVERRIDE); 
+		Button driveRaiseHalfway = new JoystickButton(operatorController, Constants.DRIVE_RAISE_HALFWAY); 
+		Button driveRaiseFully = new JoystickButton(operatorController, Constants.DRIVE_RAISE_FULLY); 
 
 		// Driver Button Bindings
 		reverseDriveButton.whenPressed(() -> {
@@ -278,6 +282,7 @@ public class RobotContainer {
 			new Shoot(shooterSubsystem, shooterFeederSubsystem, false); 
 		});
 
+		/*
 		// Shooter Feeder Bindings 
 		rollUpwardsButton.whileActiveContinuous(() -> {
 			shooterFeederSubsystem.setRollDirection(true);
@@ -287,12 +292,20 @@ public class RobotContainer {
 		rollDownwardsButton.whileActiveContinuous(() -> {
 			shooterFeederSubsystem.setRollDirection(false); 
 			shooterFeederSubsystem.setRollSpeed(1.0); 
-		}); 
+		}); */
 
 		// Climber Button Bindings 
 		overrideClimbTime.whenPressed(() -> {
 			Climb.toggleOverride();
 		});
+
+		driveRaiseHalfway.whenPressed(
+			new DriveRaise(climbSubsystem, drivetrain) 
+		); 
+
+		driveRaiseFully.whenPressed(
+			new DriveRaise(climbSubsystem, drivetrain) // TODO: change to a similar drive raise command 
+		); 
 	}
 
 	public Command getAutonomousCommand() {

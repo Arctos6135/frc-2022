@@ -3,6 +3,7 @@ package frc.robot;
 import com.arctos6135.robotpathfinder.core.RobotSpecs;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
 
@@ -72,8 +73,9 @@ public final class Constants {
 	public static final int PREPARE_SHOOTER_BUTTON = XboxController.Button.kB.value; 
 	public static final int CLIMB_SPEED_AXIS = XboxController.Axis.kLeftY.value; 
 	public static final int CLIMB_TIME_OVERRIDE = XboxController.Button.kA.value; 
-	public static final int ROLL_UPWARDS = XboxController.Button.kBumperLeft.value; 
-	public static final int ROLL_DOWNWARDS = XboxController.Button.kBumperRight.value; 
+	public static final int ROLL = XboxController.Axis.kLeftY.value; 
+	public static final int DRIVE_RAISE_HALFWAY = XboxController.Button.kBumperLeft.value; 
+	public static final int DRIVE_RAISE_FULLY = XboxController.Button.kBumperRight.value; 
 
 	// Robot Dimensions
 	// TODO: change these to match robot
@@ -97,4 +99,9 @@ public final class Constants {
 	public static final double UPPER_HUB = 120.;
 
 	public static final double BALL_MASS = 9.5;
+
+	// Colors 
+	// TODO: change if necessary
+	public static final Color OUR_ALLIANCE = Color.kBlue; 
+	public static final Color OPPOSING_ALLIANCE = Color.kRed; 
 }
