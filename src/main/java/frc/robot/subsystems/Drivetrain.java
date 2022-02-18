@@ -187,7 +187,7 @@ public class Drivetrain extends SubsystemBase {
     return leftEncoder.getVelocity();
   }
  
-  public double[] getAccelearations() {
+  public double[] getAccelerations() {
     double dt = Timer.getFPGATimestamp() - lastTime;
     double rightRate = getRightVelocity();
     double leftRate = getLeftVelocity();

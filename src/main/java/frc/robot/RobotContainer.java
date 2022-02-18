@@ -21,6 +21,8 @@ import frc.robot.commands.Intake;
 import frc.robot.commands.SensoredRoll; 
 import frc.robot.commands.Shoot;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.climbing.Climb;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.Shooter;
@@ -39,12 +41,13 @@ public class RobotContainer {
 	private final IntakeSubsystem intakeSubsystem;
 	private final ShooterFeederSubsystem shooterFeederSubsystem; 
 	private final Shooter shooterSubsystem;
+	private final ClimbSubsystem climbSubsystem; 
 
 	private static final XboxController driverController = new XboxController(Constants.XBOX_DRIVER);
 	private static final XboxController operatorController = new XboxController(Constants.XBOX_OPERATOR);
 
 	// Shuffleboard Tabs
-	final ShuffleboardTab configTab;
+	final ShuffleboardTab configTab; 
 	final ShuffleboardTab driveTab;
 	final ShuffleboardTab colorTab; 
 	final ShuffleboardTab prematchTab;
@@ -54,6 +57,7 @@ public class RobotContainer {
 	NetworkTableEntry driveReversedEntry;
 	NetworkTableEntry precisionDriveEntry;
 	NetworkTableEntry overrideModeEntry;
+	NetworkTableEntry shooterRPMEntry; 
 	
 	// Logging Related
 	NetworkTableEntry lastError;
@@ -62,6 +66,8 @@ public class RobotContainer {
 	// Drivetrain Status
 	SimpleWidget drivetrainMotorStatus;
 	SimpleWidget shooterMotorStatus;
+	SimpleWidget shooterFeederStatus;
+	SimpleWidget climbStatus;
 
 	static final RobotLogger logger = new RobotLogger();
 
@@ -86,6 +92,11 @@ public class RobotContainer {
 		shooterSubsystem.setDefaultCommand(
 			// Shoot for the lower hub
 			new Shoot(shooterSubsystem, shooterFeederSubsystem, true)
+		);
+
+		climbSubsystem = new ClimbSubsystem(Constants.HOOK_DEPLOYMENT_MOTOR, Constants.LEFT_CLIMB_MOTOR, Constants.RIGHT_CLIMB_MOTOR); 
+		climbSubsystem.setDefaultCommand(
+			new Climb(climbSubsystem, operatorController)
 		);
 
 		// Shuffle Board Tabs
@@ -137,14 +148,15 @@ public class RobotContainer {
 			Constants.MOTOR_SHUTOFF_TEMP = notif.value.getDouble();
 				}, EntryListenerFlags.kUpdate);
 
-		configTab.add("Shooter PID", new SendableCANPIDController(shooterSubsystem.getPIDController())).withWidget(BuiltInWidgets.kPIDController)
-		.withPosition(6, 4).withSize(6, 12);
+		configTab.add("Shooter PID", new SendableCANPIDController(shooterSubsystem.getPIDController()))
+		.withWidget(BuiltInWidgets.kPIDController).withPosition(6, 4).withSize(6, 12);
 				
 		// Write Settings of Spark Max Motors on Drivetrain and Shooter 
 		InstantCommand burnFlashCommand = new InstantCommand(() -> {
 			drivetrain.burnFlash(); 
 			shooterSubsystem.burnFlash(); 
 		}); 
+
 		burnFlashCommand.setName("Burn Flash");
 		configTab.add("Burn Spark Motors", burnFlashCommand).withWidget(BuiltInWidgets.kCommand).withPosition(36, 0); 
 
@@ -157,6 +169,15 @@ public class RobotContainer {
 		
 		precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
 		.withPosition(4, 0).withSize(4, 4).getEntry();
+
+		shooterRPMEntry = driveTab.add("Shooter RPM", 0).withWidget(BuiltInWidgets.kDial).withPosition(37, 8)
+		.withSize(6, 6).withProperties(Map.of("min", 0, "max", 5000)).getEntry(); 
+
+		InstantCommand climbOverrideCommand = new InstantCommand(() -> {
+			Climb.toggleOverride();
+		});
+		climbOverrideCommand.setName("Override");
+		driveTab.add("Override Climb Time", climbOverrideCommand).withWidget(BuiltInWidgets.kCommand).withPosition(10, 0).withSize(8, 8);
 		
 		// Color Detection of Balls 
 		colorTab.add("Red Color", shooterFeederSubsystem.getColorSensor().getRed());
@@ -192,19 +213,31 @@ public class RobotContainer {
 		});
 	}
 
+	public void updateDashboard() {
+		shooterRPMEntry.setNumber(shooterSubsystem.getVelocity()); 
+	}
+
 	private void configureButtonBindings() {
 		// Driving Related 
 		Button reverseDriveButton = new JoystickButton(driverController, Constants.REVERSE_DRIVE_DIRECTION);
 		Button dtOverheatOverrideButton = new JoystickButton(driverController, Constants.OVERRIDE_MOTOR_PROTECTION);
 		Button precisionDriveButton = new JoystickButton(driverController, Constants.PRECISION_DRIVE_TOGGLE);
+
+		AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
+
 		// TODO: connect to shooter data
 		
 		// Shooter Related 
-		Button prepareShooter = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
-		Button deployShooterLower = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_LOWER_BUTTON);
-		Button deployShooterUpper = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_UPPER_BUTTON);
-		
-		AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
+		Button prepareShooterButton = new JoystickButton(operatorController, Constants.PREPARE_SHOOTER_BUTTON);
+		Button deployShooterLowerButton = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_LOWER_BUTTON);
+		Button deployShooterUpperButton = new JoystickButton(operatorController, Constants.DEPLOY_SHOOTER_UPPER_BUTTON);
+
+		// Shooter Feeder Related 
+		Button rollUpwardsButton = new JoystickButton(operatorController, Constants.ROLL_UPWARDS); 
+		Button rollDownwardsButton = new JoystickButton(operatorController, Constants.ROLL_DOWNWARDS); 
+
+		// Climb Related
+		Button overrideClimbTime = new JoystickButton(operatorController, Constants.CLIMB_TIME_OVERRIDE); 
 
 		// Driver Button Bindings
 		reverseDriveButton.whenPressed(() -> {
@@ -231,17 +264,34 @@ public class RobotContainer {
 			}
 		});
 
+		// Shooter Button Bindings 
 		// TODO: prepare shooter
-		prepareShooter.whenPressed(() -> {
+		prepareShooterButton.whenPressed(() -> {
 			shooterSubsystem.shooterReady = true;
 		});
 
-		deployShooterLower.whenActive(() -> {
+		deployShooterLowerButton.whenActive(() -> {
 			new Shoot(shooterSubsystem, shooterFeederSubsystem, true); 
 		});
 
-		deployShooterUpper.whenActive(() -> {
+		deployShooterUpperButton.whenActive(() -> {
 			new Shoot(shooterSubsystem, shooterFeederSubsystem, false); 
+		});
+
+		// Shooter Feeder Bindings 
+		rollUpwardsButton.whileActiveContinuous(() -> {
+			shooterFeederSubsystem.setRollDirection(true);
+			shooterFeederSubsystem.setRollSpeed(1.0);
+		}); 
+
+		rollDownwardsButton.whileActiveContinuous(() -> {
+			shooterFeederSubsystem.setRollDirection(false); 
+			shooterFeederSubsystem.setRollSpeed(1.0); 
+		}); 
+
+		// Climber Button Bindings 
+		overrideClimbTime.whenPressed(() -> {
+			Climb.toggleOverride();
 		});
 	}
 
