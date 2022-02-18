@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.arctos6135.robotlib.logging.RobotLogger;
 import com.arctos6135.robotlib.newcommands.triggers.AnalogTrigger;
@@ -124,12 +125,6 @@ public class RobotContainer {
     
     precisionDriveEntry = driveTab.add("Precision", TeleopDrive.isPrecisionDrive()).withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(4, 0).withSize(4, 4).getEntry();
-    
-    
-  }
-
-  private void configureNetworkEntries() {
-
   }
 
   /**
@@ -187,14 +182,27 @@ public class RobotContainer {
   }
 
   private void initLogger() {
-    try {
-      logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
-      // TODO: initialize logger settings 
-    } catch (IOException e) {
-      e.printStackTrace();
-      // TODO: log the error 
-    }
-  }
+	try {
+		logger.init(Robot.class, new File(Filesystem.getOperatingDirectory().getCanonicalPath() + "/frc-robot-logs"));
+
+		logger.setLevel(Level.FINE);
+		
+		logger.setLogHandler((level, message) -> {
+			if (level == Level.SEVERE) {
+				lastError.setString(message);
+			} else if (level == Level.WARNING) {
+				lastWarning.setString(message);
+			}
+		});
+
+		logger.cleanLogs(72);
+		logger.logInfo("Logger initialized");
+		
+	} catch (IOException e) {
+		e.printStackTrace();
+		lastError.setString("Failed to initialize logger");
+	}
+}
   
   /**
    * Get the robot logger. 
