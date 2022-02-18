@@ -140,7 +140,6 @@ public class RobotContainer {
     AnalogTrigger precisionDriveTrigger = new AnalogTrigger(driverController, Constants.PRECISION_DRIVE_HOLD, 0.5);
 
     // Driver Button Bindings 
-    // TODO: add tab entries on shuffle board
     reverseDriveButton.whenPressed(() -> {
       TeleopDrive.toggleReverseDrive();
       getLogger().logInfo("Drive reverse set to " + TeleopDrive.isReversed());
