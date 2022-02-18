@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.indexer;
 
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;

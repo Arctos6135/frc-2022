@@ -3,10 +3,11 @@ package frc.robot;
 import com.arctos6135.robotpathfinder.core.RobotSpecs;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
 
-	// SPARK MAX Motors
+	// Drivetrain Motors 
 	public static final int RIGHT_CANSPARKMAX = 1;
 	public static final int LEFT_CANSPARKMAX = 2;
 	public static final int RIGHT_CANSPARKMAX_FOLLOWER = 3;
@@ -18,8 +19,18 @@ public final class Constants {
 
 	// Intake Motors
 	// TODO: change when attached to PDP 
-	public static final int LEFT_INTAKE_MOTOR = 0;
-	public static final int RIGHT_INTAKE_MOTOR = 0;
+	public static final int LEFT_INTAKE_MOTOR = 7;
+	public static final int RIGHT_INTAKE_MOTOR = 8;
+
+	// Climb Motors 
+	public static final int HOOK_DEPLOYMENT_MOTOR = 9; 
+	public static final int LEFT_CLIMB_MOTOR = 10; 
+	public static final int RIGHT_CLIMB_MOTOR = 11; 
+
+	// Climb Related Constants
+	public static final int START_CLIMB_TIME = 20; // seconds
+	public static final double CLIMB_DRIVE_TIME = 0.1; 
+	public static final double RAISE_HALFWAY = 4.1; 
 
 	public static final double INTAKE_ARM_LOWERED = 1.2; 
 	public static final double INTAKE_ARM_RAISED = 0; 
@@ -30,7 +41,7 @@ public final class Constants {
 	public static final double ROLL_SPEED = 0.5; 
 
 	// SPARK MAX Encoders (in inches)
-	public static final double WHEEL_DIAMETER = 4.;
+	public static final double WHEEL_DIAMETER = 4.0;
 	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
 	public static final double GEARBOX_RATIO = 0;
 	public static final double POSITION_CONVERSION_FACTOR = WHEEL_CIRCUMFERENCE * GEARBOX_RATIO;
@@ -42,7 +53,7 @@ public final class Constants {
 	public static double MOTOR_SHUTOFF_TEMP = 90;
 	
 	// Xbox Controller
-	public static final double CONTROLLER_DEADZONE = .15;
+	public static final double CONTROLLER_DEADZONE = 0.15;
 
 	// Driver Controller
 	public static final int XBOX_DRIVER = 0;
@@ -57,12 +68,15 @@ public final class Constants {
 
 	// Operator Controller 
 	public static final int XBOX_OPERATOR = 1;
-	public static final int SHOOTER_SPEED_BUTTON = XboxController.Button.kB.value; 
 	public static final int DEPLOY_SHOOTER_LOWER_BUTTON = XboxController.Button.kX.value;
 	public static final int DEPLOY_SHOOTER_UPPER_BUTTON = XboxController.Button.kY.value;
-	public static final int PREPARE_SHOOTER_BUTTON = XboxController.Button.kA.value; 
+	public static final int PREPARE_SHOOTER_BUTTON = XboxController.Button.kB.value; 
+	public static final int CLIMB_SPEED_AXIS = XboxController.Axis.kLeftY.value; 
+	public static final int CLIMB_TIME_OVERRIDE = XboxController.Button.kA.value; 
+	public static final int ROLL = XboxController.Axis.kLeftY.value; 
+	public static final int DRIVE_RAISE_HALFWAY = XboxController.Button.kBumperLeft.value; 
+	public static final int DRIVE_RAISE_FULLY = XboxController.Button.kBumperRight.value; 
 
-    
 	// Robot Dimensions
 	// TODO: change these to match robot
 	public static final double ROBOT_MAX_VELOCITY = 0;
@@ -85,4 +99,9 @@ public final class Constants {
 	public static final double UPPER_HUB = 120.;
 
 	public static final double BALL_MASS = 9.5;
+
+	// Colors 
+	// TODO: change if necessary
+	public static final Color OUR_ALLIANCE = Color.kBlue; 
+	public static final Color OPPOSING_ALLIANCE = Color.kRed; 
 }

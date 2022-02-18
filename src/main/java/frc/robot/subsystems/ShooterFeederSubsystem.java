@@ -21,7 +21,8 @@ public class ShooterFeederSubsystem extends SubsystemBase {
     private int ballCount = 0; 
 
     public ShooterFeederSubsystem(int rollerMotor) {
-        this.rollerMotor = new CANSparkMax(rollerMotor, MotorType.kBrushless); 
+        this.rollerMotor = new CANSparkMax(rollerMotor, MotorType.kBrushless);
+
         this.rollerMotor.setIdleMode(IdleMode.kBrake); 
 
         this.colorSensor = new ColorSensorV3(I2C.Port.kOnboard); 

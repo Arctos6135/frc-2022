@@ -194,6 +194,6 @@ public class Shooter extends SubsystemBase {
 		 * it's just a rough estimate based on a uniform wheel
 		 */
 		if (power > 33) throw new PowerException("NEO cannot support a throw that far");
-		masterShooterMotor.set(power/33);
+		setVelocity(power/33);
 	}
 }
