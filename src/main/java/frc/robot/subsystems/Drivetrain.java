@@ -233,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
     return ahrs.getFusedHeading();
   }
  
-  /**
+  /** 
    * Reset the heading of the robot.
    */
   public void zeroHeading() {
